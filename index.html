@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>James Jackson III — RevOps Portfolio</title>
+<meta name="description" content="SVP RevOps portfolio — pipeline analytics, territory modeling, and AI-native RevOps frameworks. Built by James Jackson III.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-primary: #0a0b10;
+    --bg-card: #12141d;
+    --bg-card-hover: #1a1d2a;
+    --border: #1f2233;
+    --border-hover: #2d3148;
+    --text-primary: #e8eaed;
+    --text-secondary: #9aa0b4;
+    --text-muted: #5c6178;
+    --accent-blue: #4f8cff;
+    --accent-green: #34d399;
+    --accent-purple: #a78bfa;
+    --accent-cyan: #22d3ee;
+    --gradient-blue: linear-gradient(135deg, #4f8cff 0%, #6366f1 100%);
+    --gradient-green: linear-gradient(135deg, #34d399 0%, #059669 100%);
+    --gradient-purple: linear-gradient(135deg, #a78bfa 0%, #7c3aed 100%);
+    --gradient-cyan: linear-gradient(135deg, #22d3ee 0%, #0891b2 100%);
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    min-height: 100vh;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* Nav */
+  .nav {
+    padding: 20px 0;
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    background: rgba(10, 11, 16, 0.92);
+    backdrop-filter: blur(16px);
+    z-index: 100;
+  }
+  .nav-inner {
+    max-width: 1080px;
+    margin: 0 auto;
+    padding: 0 32px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .nav-logo {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text-primary);
+    letter-spacing: -0.3px;
+    text-decoration: none;
+  }
+  .nav-links { display: flex; gap: 24px; }
+  .nav-links a {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-muted);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  .nav-links a:hover { color: var(--text-primary); }
+
+  /* Hero */
+  .hero {
+    max-width: 1080px;
+    margin: 0 auto;
+    padding: 80px 32px 64px;
+  }
+  .hero-eyebrow {
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--accent-blue);
+    margin-bottom: 16px;
+  }
+  .hero h1 {
+    font-size: 48px;
+    font-weight: 800;
+    letter-spacing: -1.5px;
+    line-height: 1.1;
+    margin-bottom: 20px;
+    background: linear-gradient(135deg, #e8eaed 0%, #9aa0b4 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .hero p {
+    font-size: 17px;
+    color: var(--text-secondary);
+    max-width: 620px;
+    line-height: 1.7;
+    margin-bottom: 32px;
+  }
+  .hero-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+  .hero-tag {
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    border: 1px solid var(--border);
+    color: var(--text-secondary);
+    background: rgba(255,255,255,0.02);
+  }
+
+  /* Section */
+  .section {
+    max-width: 1080px;
+    margin: 0 auto;
+    padding: 0 32px 80px;
+  }
+  .section-header {
+    margin-bottom: 32px;
+  }
+  .section-header h2 {
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+  }
+  .section-header p {
+    font-size: 15px;
+    color: var(--text-secondary);
+    max-width: 560px;
+  }
+
+  /* Tool Cards */
+  .tools-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 20px;
+  }
+  .tool-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 28px;
+    text-decoration: none;
+    color: inherit;
+    transition: all 0.25s ease;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+  .tool-card:hover {
+    border-color: var(--border-hover);
+    background: var(--bg-card-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+  }
+  .tool-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    border-radius: 14px 14px 0 0;
+    opacity: 0;
+    transition: opacity 0.25s;
+  }
+  .tool-card:hover::before { opacity: 1; }
+  .tool-card.blue::before { background: var(--gradient-blue); }
+  .tool-card.green::before { background: var(--gradient-green); }
+  .tool-card.purple::before { background: var(--gradient-purple); }
+  .tool-card.cyan::before { background: var(--gradient-cyan); }
+  .tool-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    margin-bottom: 18px;
+    flex-shrink: 0;
+  }
+  .tool-card.blue .tool-icon { background: rgba(79,140,255,0.12); }
+  .tool-card.green .tool-icon { background: rgba(52,211,153,0.12); }
+  .tool-card.purple .tool-icon { background: rgba(167,139,250,0.12); }
+  .tool-card.cyan .tool-icon { background: rgba(34,211,238,0.12); }
+  .tool-card h3 {
+    font-size: 17px;
+    font-weight: 700;
+    letter-spacing: -0.3px;
+    margin-bottom: 8px;
+  }
+  .tool-card .desc {
+    font-size: 14px;
+    color: var(--text-secondary);
+    line-height: 1.6;
+    margin-bottom: 18px;
+    flex: 1;
+  }
+  .tool-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .tool-tags span {
+    font-size: 11px;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 4px;
+    background: rgba(255,255,255,0.04);
+    color: var(--text-muted);
+  }
+  .tool-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 16px;
+  }
+  .tool-status.live { color: var(--accent-green); }
+  .tool-status.live::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--accent-green);
+    animation: pulse 2s ease infinite;
+  }
+  .tool-status.coming { color: var(--text-muted); }
+  .tool-status.coming::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--text-muted);
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+
+  /* POV Section */
+  .pov-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 36px;
+  }
+  .pov-card h3 {
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: -0.3px;
+    margin-bottom: 16px;
+  }
+  .pov-card p {
+    font-size: 15px;
+    color: var(--text-secondary);
+    line-height: 1.8;
+    margin-bottom: 16px;
+  }
+  .pov-card p:last-child { margin-bottom: 0; }
+
+  /* Experience */
+  .exp-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+  }
+  .exp-item {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px;
+  }
+  .exp-item .role {
+    font-size: 14px;
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+  .exp-item .company {
+    font-size: 13px;
+    color: var(--accent-blue);
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+  .exp-item .period {
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+
+  /* Footer */
+  .footer {
+    border-top: 1px solid var(--border);
+    padding: 32px;
+    text-align: center;
+    font-size: 13px;
+    color: var(--text-muted);
+  }
+  .footer a {
+    color: var(--accent-blue);
+    text-decoration: none;
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .hero h1 { font-size: 32px; }
+    .hero { padding: 48px 20px 40px; }
+    .section { padding: 0 20px 48px; }
+    .tools-grid { grid-template-columns: 1fr; }
+    .exp-grid { grid-template-columns: 1fr 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="/" class="nav-logo">JJ III</a>
+    <div class="nav-links">
+      <a href="#tools">Tools</a>
+      <a href="#pov">POV</a>
+      <a href="#experience">Experience</a>
+      <a href="https://linkedin.com/in/" target="_blank">LinkedIn</a>
+    </div>
+  </div>
+</nav>
+
+<section class="hero">
+  <div class="hero-eyebrow">RevOps Portfolio</div>
+  <h1>I build the systems that<br>make revenue predictable.</h1>
+  <p>SVP-level RevOps leader with a track record at Canva, Snowflake, DocuSign, Cisco Meraki, and Microsoft. I design and ship the analytics, processes, and tech stack that turn pipeline into forecast accuracy and forecast accuracy into board confidence.</p>
+  <div class="hero-meta">
+    <span class="hero-tag">Pipeline Analytics</span>
+    <span class="hero-tag">Territory Design</span>
+    <span class="hero-tag">Rev Tech Architecture</span>
+    <span class="hero-tag">AI-Native RevOps</span>
+    <span class="hero-tag">Harvard MBA</span>
+  </div>
+</section>
+
+<section class="section" id="tools">
+  <div class="section-header">
+    <h2>Working Tools</h2>
+    <p>Proof-of-concept tools demonstrating RevOps systems thinking. Interactive, data-driven, built to be useful — not just pretty.</p>
+  </div>
+
+  <div class="tools-grid">
+    <a href="pipeline-health-dashboard.html" class="tool-card blue">
+      <div class="tool-icon">⚡</div>
+      <div class="tool-status live">Live</div>
+      <h3>Pipeline Health Dashboard</h3>
+      <div class="desc">CRO-level executive cockpit. Composite health score, pipeline coverage vs. quota, stage-by-stage conversion benchmarking, top-of-funnel vs. bottom-of-funnel gap analysis, and auto-generated action items. Plug in your numbers and get instant diagnostics.</div>
+      <div class="tool-tags">
+        <span>Coverage Analysis</span>
+        <span>Funnel Diagnostics</span>
+        <span>Win Rate</span>
+        <span>Velocity</span>
+      </div>
+    </a>
+
+    <div class="tool-card green">
+      <div class="tool-icon">🗺</div>
+      <div class="tool-status coming">Coming Soon</div>
+      <h3>Territory Model Builder</h3>
+      <div class="desc">Balanced territory design using account scoring, rep capacity modeling, and geographic optimization. Upload your account list and generate equitable territory assignments with coverage and capacity metrics.</div>
+      <div class="tool-tags">
+        <span>Account Scoring</span>
+        <span>Capacity Model</span>
+        <span>Equity Analysis</span>
+      </div>
+    </div>
+
+    <div class="tool-card purple">
+      <div class="tool-icon">🏗</div>
+      <div class="tool-status coming">Coming Soon</div>
+      <h3>Rev Tech Stack Architect</h3>
+      <div class="desc">Interactive framework for designing a revenue technology stack by company stage, from seed to enterprise. Maps tools to use cases, identifies integration dependencies, and flags gaps. Opinionated and vendor-agnostic.</div>
+      <div class="tool-tags">
+        <span>Stack Design</span>
+        <span>Integration Map</span>
+        <span>Stage-Gated</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="pov">
+  <div class="section-header">
+    <h2>Point of View</h2>
+  </div>
+
+  <div class="pov-card">
+    <h3>The AI-Native RevOps Stack Is Coming — Most Teams Aren't Ready</h3>
+    <p>The RevOps stack of 2027 won't be a better version of today's stack. It'll be a fundamentally different architecture. The current model — CRM as system of record, BI layer on top, point solutions duct-taped together — was designed for a world where data was scarce and human judgment was the bottleneck. That world is ending.</p>
+    <p>AI-native RevOps means three things: predictive pipeline management that replaces gut-feel forecasting, autonomous data hygiene that eliminates the "garbage in" problem at the source, and intelligent workflow orchestration that routes the right action to the right person at the right time without manual rules engines.</p>
+    <p>The RevOps leaders who thrive will be the ones who can architect this transition — not by ripping and replacing overnight, but by building an AI layer on top of existing infrastructure that compounds in value as data quality improves. That's the design problem I'm most interested in solving.</p>
+  </div>
+</section>
+
+<section class="section" id="experience">
+  <div class="section-header">
+    <h2>Experience</h2>
+  </div>
+
+  <div class="exp-grid">
+    <div class="exp-item">
+      <div class="role">VP, Revenue Operations</div>
+      <div class="company">Canva</div>
+      <div class="period">Recent</div>
+    </div>
+    <div class="exp-item">
+      <div class="role">Senior RevOps</div>
+      <div class="company">Snowflake</div>
+      <div class="period">Prior</div>
+    </div>
+    <div class="exp-item">
+      <div class="role">Senior RevOps</div>
+      <div class="company">DocuSign</div>
+      <div class="period">Prior</div>
+    </div>
+    <div class="exp-item">
+      <div class="role">Senior RevOps</div>
+      <div class="company">Cisco Meraki</div>
+      <div class="period">Prior</div>
+    </div>
+    <div class="exp-item">
+      <div class="role">RevOps</div>
+      <div class="company">Microsoft</div>
+      <div class="period">Prior</div>
+    </div>
+    <div class="exp-item">
+      <div class="role">MBA</div>
+      <div class="company">Harvard Business School</div>
+      <div class="period"></div>
+    </div>
+  </div>
+</section>
+
+<footer class="footer">
+  <p>Built by James Jackson III · <a href="https://github.com/jjacksoniii" target="_blank">GitHub</a> · <a href="https://linkedin.com/in/" target="_blank">LinkedIn</a></p>
+</footer>
+
+</body>
+</html>

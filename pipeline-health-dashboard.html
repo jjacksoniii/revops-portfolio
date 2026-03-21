@@ -1,0 +1,1007 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pipeline Health Dashboard — CRO Executive View</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+  :root {
+    --bg-primary: #0f1117;
+    --bg-card: #1a1d27;
+    --bg-card-hover: #222633;
+    --bg-input: #14161e;
+    --border: #2a2e3d;
+    --text-primary: #e8eaed;
+    --text-secondary: #9aa0b0;
+    --text-muted: #636a7e;
+    --accent-blue: #4f8cff;
+    --accent-green: #34d399;
+    --accent-yellow: #fbbf24;
+    --accent-red: #f87171;
+    --accent-purple: #a78bfa;
+    --accent-cyan: #22d3ee;
+    --health-green: #059669;
+    --health-yellow: #d97706;
+    --health-red: #dc2626;
+    --gradient-blue: linear-gradient(135deg, #4f8cff 0%, #6366f1 100%);
+    --gradient-green: linear-gradient(135deg, #34d399 0%, #059669 100%);
+    --gradient-purple: linear-gradient(135deg, #a78bfa 0%, #7c3aed 100%);
+    --gradient-cyan: linear-gradient(135deg, #22d3ee 0%, #0891b2 100%);
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', sans-serif;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    min-height: 100vh;
+    line-height: 1.5;
+  }
+  .app-header {
+    padding: 20px 32px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(15, 17, 23, 0.95);
+    backdrop-filter: blur(12px);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .app-header h1 {
+    font-size: 20px;
+    font-weight: 600;
+    letter-spacing: -0.3px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .app-header h1 .icon {
+    width: 32px;
+    height: 32px;
+    background: var(--gradient-blue);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+  }
+  .header-meta {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    color: var(--text-secondary);
+    font-size: 13px;
+  }
+  .header-meta .badge {
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .container {
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: 24px 32px 48px;
+  }
+
+  /* Input Panel */
+  .input-panel {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 24px;
+  }
+  .input-panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  .input-panel-header h2 {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+  }
+  .input-panel-header button {
+    padding: 8px 20px;
+    background: var(--gradient-blue);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .input-panel-header button:hover { opacity: 0.9; transform: translateY(-1px); }
+  .input-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 16px;
+  }
+  .input-group label {
+    display: block;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+  }
+  .input-group input {
+    width: 100%;
+    padding: 10px 12px;
+    background: var(--bg-input);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text-primary);
+    font-size: 14px;
+    font-weight: 500;
+    transition: border-color 0.2s;
+  }
+  .input-group input:focus {
+    outline: none;
+    border-color: var(--accent-blue);
+  }
+  .input-group .prefix {
+    position: relative;
+  }
+  .input-group .prefix input { padding-left: 22px; }
+  .input-group .prefix::before {
+    content: '$';
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-muted);
+    font-size: 14px;
+  }
+  .section-divider {
+    grid-column: 1 / -1;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--accent-blue);
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    padding-top: 8px;
+    border-top: 1px solid var(--border);
+  }
+
+  /* Health Score Banner */
+  .health-banner {
+    border-radius: 12px;
+    padding: 28px 32px;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    transition: background 0.3s;
+  }
+  .health-banner.green { background: linear-gradient(135deg, rgba(5,150,105,0.15) 0%, rgba(52,211,153,0.08) 100%); border: 1px solid rgba(52,211,153,0.3); }
+  .health-banner.yellow { background: linear-gradient(135deg, rgba(217,119,6,0.15) 0%, rgba(251,191,36,0.08) 100%); border: 1px solid rgba(251,191,36,0.3); }
+  .health-banner.red { background: linear-gradient(135deg, rgba(220,38,38,0.15) 0%, rgba(248,113,113,0.08) 100%); border: 1px solid rgba(248,113,113,0.3); }
+  .health-left { display: flex; align-items: center; gap: 20px; }
+  .health-dot {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    font-weight: 700;
+  }
+  .health-banner.green .health-dot { background: var(--health-green); color: white; }
+  .health-banner.yellow .health-dot { background: var(--health-yellow); color: white; }
+  .health-banner.red .health-dot { background: var(--health-red); color: white; }
+  .health-label { font-size: 22px; font-weight: 700; letter-spacing: -0.3px; }
+  .health-sub { font-size: 13px; color: var(--text-secondary); margin-top: 2px; }
+  .health-right { text-align: right; }
+  .health-right .score { font-size: 36px; font-weight: 800; letter-spacing: -1px; }
+  .health-right .score-label { font-size: 12px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; }
+
+  /* KPI Row */
+  .kpi-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+  .kpi-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    transition: all 0.2s;
+  }
+  .kpi-card:hover { border-color: rgba(79,140,255,0.3); background: var(--bg-card-hover); }
+  .kpi-label {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+  }
+  .kpi-value {
+    font-size: 28px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    line-height: 1.1;
+  }
+  .kpi-detail {
+    font-size: 12px;
+    color: var(--text-secondary);
+    margin-top: 6px;
+  }
+  .kpi-value.blue { color: var(--accent-blue); }
+  .kpi-value.green { color: var(--accent-green); }
+  .kpi-value.purple { color: var(--accent-purple); }
+  .kpi-value.cyan { color: var(--accent-cyan); }
+
+  /* Charts Grid */
+  .charts-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+  .chart-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+  }
+  .chart-card h3 {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    margin-bottom: 16px;
+  }
+
+  /* Funnel Analysis */
+  .funnel-section {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+  .funnel-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+  }
+  .funnel-card h3 {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    margin-bottom: 16px;
+  }
+  .funnel-bar-row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 12px;
+    gap: 12px;
+  }
+  .funnel-bar-label {
+    width: 100px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-align: right;
+    flex-shrink: 0;
+  }
+  .funnel-bar-track {
+    flex: 1;
+    height: 28px;
+    background: rgba(255,255,255,0.04);
+    border-radius: 6px;
+    overflow: hidden;
+    position: relative;
+  }
+  .funnel-bar-fill {
+    height: 100%;
+    border-radius: 6px;
+    transition: width 0.5s ease;
+    display: flex;
+    align-items: center;
+    padding-left: 10px;
+    font-size: 12px;
+    font-weight: 700;
+    color: white;
+    min-width: 40px;
+  }
+  .funnel-bar-count {
+    font-size: 12px;
+    color: var(--text-muted);
+    width: 50px;
+    text-align: right;
+    flex-shrink: 0;
+  }
+
+  /* Conversion Table */
+  .conversion-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  .conversion-table th {
+    text-align: left;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-muted);
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--border);
+  }
+  .conversion-table td {
+    padding: 10px 12px;
+    font-size: 13px;
+    color: var(--text-primary);
+    border-bottom: 1px solid rgba(42,46,61,0.5);
+  }
+  .conversion-table tr:hover td { background: rgba(79,140,255,0.03); }
+  .rate-badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 700;
+  }
+  .rate-badge.good { background: rgba(52,211,153,0.15); color: var(--accent-green); }
+  .rate-badge.warn { background: rgba(251,191,36,0.15); color: var(--accent-yellow); }
+  .rate-badge.bad { background: rgba(248,113,113,0.15); color: var(--accent-red); }
+
+  /* CRO Insights */
+  .insights-panel {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 24px;
+  }
+  .insights-panel h3 {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .insight-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 12px 16px;
+    border-radius: 8px;
+    margin-bottom: 8px;
+    font-size: 13px;
+    line-height: 1.5;
+  }
+  .insight-item.critical { background: rgba(220,38,38,0.08); border-left: 3px solid var(--accent-red); }
+  .insight-item.warning { background: rgba(217,119,6,0.08); border-left: 3px solid var(--accent-yellow); }
+  .insight-item.positive { background: rgba(5,150,105,0.08); border-left: 3px solid var(--accent-green); }
+  .insight-item.info { background: rgba(79,140,255,0.08); border-left: 3px solid var(--accent-blue); }
+  .insight-icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+
+  /* Responsive */
+  @media (max-width: 1200px) {
+    .kpi-row { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (max-width: 900px) {
+    .charts-grid, .funnel-section { grid-template-columns: 1fr; }
+    .kpi-row { grid-template-columns: 1fr; }
+    .container { padding: 16px; }
+  }
+
+  /* Toggle */
+  .toggle-btn {
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--text-secondary);
+    padding: 6px 14px;
+    border-radius: 6px;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .toggle-btn:hover { border-color: var(--accent-blue); color: var(--accent-blue); }
+</style>
+</head>
+<body>
+
+<header class="app-header">
+  <h1>
+    <span class="icon">⚡</span>
+    Pipeline Health Dashboard
+  </h1>
+  <div class="header-meta">
+    <span id="lastUpdated"></span>
+    <button class="toggle-btn" onclick="toggleInputs()">⚙ Adjust Inputs</button>
+  </div>
+</header>
+
+<div class="container">
+
+  <!-- Input Panel -->
+  <div class="input-panel" id="inputPanel">
+    <div class="input-panel-header">
+      <h2>Pipeline Inputs</h2>
+      <button onclick="calculate()">Recalculate Dashboard →</button>
+    </div>
+    <div class="input-grid">
+      <div class="section-divider">Targets & Pipeline</div>
+      <div class="input-group">
+        <label>Quarterly Quota</label>
+        <div class="prefix"><input type="text" id="quota" value="2,500,000"></div>
+      </div>
+      <div class="input-group">
+        <label>Total Pipeline Value</label>
+        <div class="prefix"><input type="text" id="totalPipeline" value="8,200,000"></div>
+      </div>
+      <div class="input-group">
+        <label>Avg Deal Size</label>
+        <div class="prefix"><input type="text" id="avgDeal" value="85,000"></div>
+      </div>
+      <div class="input-group">
+        <label>Avg Sales Cycle (Days)</label>
+        <input type="number" id="salesCycle" value="62">
+      </div>
+      <div class="input-group">
+        <label>Days Left in Quarter</label>
+        <input type="number" id="daysLeft" value="42">
+      </div>
+
+      <div class="section-divider">Deals by Stage</div>
+      <div class="input-group">
+        <label>Prospecting</label>
+        <input type="number" id="stageProspecting" value="120">
+      </div>
+      <div class="input-group">
+        <label>Discovery</label>
+        <input type="number" id="stageDiscovery" value="64">
+      </div>
+      <div class="input-group">
+        <label>Proposal</label>
+        <input type="number" id="stageProposal" value="28">
+      </div>
+      <div class="input-group">
+        <label>Negotiation</label>
+        <input type="number" id="stageNegotiation" value="14">
+      </div>
+      <div class="input-group">
+        <label>Closed Won</label>
+        <input type="number" id="stageClosedWon" value="8">
+      </div>
+      <div class="input-group">
+        <label>Closed Lost</label>
+        <input type="number" id="stageClosedLost" value="18">
+      </div>
+    </div>
+  </div>
+
+  <!-- Health Banner -->
+  <div class="health-banner" id="healthBanner">
+    <div class="health-left">
+      <div class="health-dot" id="healthDot"></div>
+      <div>
+        <div class="health-label" id="healthLabel"></div>
+        <div class="health-sub" id="healthSub"></div>
+      </div>
+    </div>
+    <div class="health-right">
+      <div class="score" id="healthScore"></div>
+      <div class="score-label">Health Score</div>
+    </div>
+  </div>
+
+  <!-- KPI Row -->
+  <div class="kpi-row">
+    <div class="kpi-card">
+      <div class="kpi-label">Pipeline Coverage Ratio</div>
+      <div class="kpi-value blue" id="kpiCoverage"></div>
+      <div class="kpi-detail" id="kpiCoverageDetail"></div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Weighted Pipeline</div>
+      <div class="kpi-value green" id="kpiWeighted"></div>
+      <div class="kpi-detail" id="kpiWeightedDetail"></div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Pipeline Velocity</div>
+      <div class="kpi-value purple" id="kpiVelocity"></div>
+      <div class="kpi-detail" id="kpiVelocityDetail"></div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Win Rate</div>
+      <div class="kpi-value cyan" id="kpiWinRate"></div>
+      <div class="kpi-detail" id="kpiWinRateDetail"></div>
+    </div>
+  </div>
+
+  <!-- Charts -->
+  <div class="charts-grid">
+    <div class="chart-card">
+      <h3>Pipeline by Stage (Deal Count)</h3>
+      <canvas id="stageChart"></canvas>
+    </div>
+    <div class="chart-card">
+      <h3>Weighted Value by Stage</h3>
+      <canvas id="weightedChart"></canvas>
+    </div>
+  </div>
+
+  <!-- Funnel Analysis -->
+  <div class="funnel-section">
+    <div class="funnel-card">
+      <h3>Pipeline Funnel</h3>
+      <div id="funnelBars"></div>
+    </div>
+    <div class="funnel-card">
+      <h3>Stage-to-Stage Conversion</h3>
+      <table class="conversion-table">
+        <thead>
+          <tr>
+            <th>Transition</th>
+            <th>Rate</th>
+            <th>Benchmark</th>
+            <th>Gap</th>
+          </tr>
+        </thead>
+        <tbody id="conversionBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Top/Bottom Funnel -->
+  <div class="charts-grid">
+    <div class="chart-card">
+      <h3>Top of Funnel vs. Bottom of Funnel</h3>
+      <canvas id="funnelCompareChart"></canvas>
+      <div id="funnelCompareInsight" style="margin-top: 16px; font-size: 13px; color: var(--text-secondary);"></div>
+    </div>
+    <div class="chart-card">
+      <h3>Coverage & Velocity vs. Target</h3>
+      <canvas id="gaugeChart"></canvas>
+    </div>
+  </div>
+
+  <!-- CRO Insights -->
+  <div class="insights-panel">
+    <h3>🎯 CRO Action Items</h3>
+    <div id="insightsList"></div>
+  </div>
+
+</div>
+
+<script>
+const fmt = (n) => {
+  if (n >= 1e6) return '$' + (n / 1e6).toFixed(1) + 'M';
+  if (n >= 1e3) return '$' + (n / 1e3).toFixed(0) + 'K';
+  return '$' + n.toFixed(0);
+};
+const pct = (n) => (n * 100).toFixed(1) + '%';
+const parseNum = (id) => {
+  const v = document.getElementById(id).value.replace(/[,$\s]/g, '');
+  return parseFloat(v) || 0;
+};
+
+const stageWeights = {
+  prospecting: 0.10,
+  discovery: 0.25,
+  proposal: 0.50,
+  negotiation: 0.75,
+  closedWon: 1.0
+};
+
+const benchmarks = {
+  prospToDisc: 0.55,
+  discToProp: 0.45,
+  propToNeg: 0.55,
+  negToClose: 0.50
+};
+
+let stageChartInstance = null;
+let weightedChartInstance = null;
+let funnelCompareInstance = null;
+let gaugeChartInstance = null;
+
+function toggleInputs() {
+  const panel = document.getElementById('inputPanel');
+  panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+}
+
+function calculate() {
+  const quota = parseNum('quota');
+  const totalPipeline = parseNum('totalPipeline');
+  const avgDeal = parseNum('avgDeal');
+  const salesCycle = parseNum('salesCycle');
+  const daysLeft = parseNum('daysLeft');
+
+  const stages = {
+    prospecting: parseNum('stageProspecting'),
+    discovery: parseNum('stageDiscovery'),
+    proposal: parseNum('stageProposal'),
+    negotiation: parseNum('stageNegotiation'),
+    closedWon: parseNum('stageClosedWon'),
+    closedLost: parseNum('stageClosedLost')
+  };
+
+  const totalDeals = stages.prospecting + stages.discovery + stages.proposal + stages.negotiation;
+  const closedTotal = stages.closedWon + stages.closedLost;
+
+  // Pipeline Coverage
+  const coverageRatio = totalPipeline / quota;
+
+  // Weighted Pipeline
+  const weightedPipeline =
+    stages.prospecting * avgDeal * stageWeights.prospecting +
+    stages.discovery * avgDeal * stageWeights.discovery +
+    stages.proposal * avgDeal * stageWeights.proposal +
+    stages.negotiation * avgDeal * stageWeights.negotiation;
+
+  // Win Rate
+  const winRate = closedTotal > 0 ? stages.closedWon / closedTotal : 0;
+
+  // Pipeline Velocity = (deals * avg deal * win rate) / cycle
+  const velocity = salesCycle > 0 ? (totalDeals * avgDeal * winRate) / salesCycle : 0;
+
+  // Conversion rates
+  const convProspToDisc = stages.prospecting > 0 ? stages.discovery / stages.prospecting : 0;
+  const convDiscToProp = stages.discovery > 0 ? stages.proposal / stages.discovery : 0;
+  const convPropToNeg = stages.proposal > 0 ? stages.negotiation / stages.proposal : 0;
+  const convNegToWon = stages.negotiation > 0 ? stages.closedWon / stages.negotiation : 0;
+
+  // Top of Funnel: Prospecting → Proposal
+  const topOfFunnel = stages.prospecting > 0 ? stages.proposal / stages.prospecting : 0;
+  // Bottom of Funnel: Proposal → Closed Won
+  const bottomOfFunnel = stages.proposal > 0 ? stages.closedWon / stages.proposal : 0;
+
+  // Health Score (0-100)
+  let healthScore = 0;
+  // Coverage component (40 pts): 3x+ = 40, 2x = 25, 1x = 10
+  if (coverageRatio >= 3) healthScore += 40;
+  else if (coverageRatio >= 2) healthScore += 25 + (coverageRatio - 2) * 15;
+  else healthScore += Math.max(0, coverageRatio / 2 * 25);
+
+  // Weighted coverage (20 pts)
+  const weightedCoverage = weightedPipeline / quota;
+  healthScore += Math.min(20, weightedCoverage * 20);
+
+  // Win rate (20 pts)
+  healthScore += Math.min(20, winRate * 80);
+
+  // Velocity (20 pts): can deals close within remaining days?
+  const velocityScore = daysLeft > 0 ? Math.min(1, (velocity * daysLeft) / quota) : 0;
+  healthScore += velocityScore * 20;
+
+  healthScore = Math.round(Math.min(100, healthScore));
+
+  // Health status
+  let healthClass, healthLabel, healthIcon;
+  if (healthScore >= 70) { healthClass = 'green'; healthLabel = 'Pipeline Healthy'; healthIcon = '✓'; }
+  else if (healthScore >= 45) { healthClass = 'yellow'; healthLabel = 'Pipeline At Risk'; healthIcon = '!'; }
+  else { healthClass = 'red'; healthLabel = 'Pipeline Critical'; healthIcon = '✕'; }
+
+  // Update UI
+  const banner = document.getElementById('healthBanner');
+  banner.className = 'health-banner ' + healthClass;
+  document.getElementById('healthDot').textContent = healthIcon;
+  document.getElementById('healthLabel').textContent = healthLabel;
+  document.getElementById('healthSub').textContent = `Coverage ${coverageRatio.toFixed(1)}x · Win Rate ${pct(winRate)} · ${daysLeft} days remaining`;
+  document.getElementById('healthScore').textContent = healthScore;
+
+  // KPIs
+  document.getElementById('kpiCoverage').textContent = coverageRatio.toFixed(1) + 'x';
+  document.getElementById('kpiCoverageDetail').textContent = `${fmt(totalPipeline)} pipeline vs. ${fmt(quota)} quota (target: 3x+)`;
+  document.getElementById('kpiWeighted').textContent = fmt(weightedPipeline);
+  document.getElementById('kpiWeightedDetail').textContent = `${pct(weightedPipeline / quota)} of quota · stage-weighted probability`;
+  document.getElementById('kpiVelocity').textContent = fmt(velocity) + '/day';
+  document.getElementById('kpiVelocityDetail').textContent = `Projected close: ${fmt(velocity * daysLeft)} in ${daysLeft} days`;
+  document.getElementById('kpiWinRate').textContent = pct(winRate);
+  document.getElementById('kpiWinRateDetail').textContent = `${stages.closedWon} won / ${closedTotal} decided (benchmark: 25-30%)`;
+
+  // Stage Chart
+  const stageLabels = ['Prospecting', 'Discovery', 'Proposal', 'Negotiation', 'Closed Won', 'Closed Lost'];
+  const stageData = [stages.prospecting, stages.discovery, stages.proposal, stages.negotiation, stages.closedWon, stages.closedLost];
+  const stageColors = ['#4f8cff', '#a78bfa', '#22d3ee', '#fbbf24', '#34d399', '#f87171'];
+
+  if (stageChartInstance) stageChartInstance.destroy();
+  stageChartInstance = new Chart(document.getElementById('stageChart'), {
+    type: 'bar',
+    data: {
+      labels: stageLabels,
+      datasets: [{
+        data: stageData,
+        backgroundColor: stageColors,
+        borderRadius: 6,
+        borderSkipped: false
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { grid: { display: false }, ticks: { color: '#636a7e', font: { size: 11 } } },
+        y: { grid: { color: 'rgba(42,46,61,0.5)' }, ticks: { color: '#636a7e', font: { size: 11 } } }
+      }
+    }
+  });
+
+  // Weighted Chart
+  const weightedData = [
+    stages.prospecting * avgDeal * stageWeights.prospecting,
+    stages.discovery * avgDeal * stageWeights.discovery,
+    stages.proposal * avgDeal * stageWeights.proposal,
+    stages.negotiation * avgDeal * stageWeights.negotiation
+  ];
+
+  if (weightedChartInstance) weightedChartInstance.destroy();
+  weightedChartInstance = new Chart(document.getElementById('weightedChart'), {
+    type: 'bar',
+    data: {
+      labels: ['Prospecting', 'Discovery', 'Proposal', 'Negotiation'],
+      datasets: [{
+        data: weightedData,
+        backgroundColor: ['rgba(79,140,255,0.7)', 'rgba(167,139,250,0.7)', 'rgba(34,211,238,0.7)', 'rgba(251,191,36,0.7)'],
+        borderRadius: 6,
+        borderSkipped: false
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { grid: { display: false }, ticks: { color: '#636a7e', font: { size: 11 } } },
+        y: {
+          grid: { color: 'rgba(42,46,61,0.5)' },
+          ticks: { color: '#636a7e', font: { size: 11 }, callback: v => fmt(v) }
+        }
+      }
+    }
+  });
+
+  // Funnel Bars
+  const maxDeals = Math.max(stages.prospecting, 1);
+  const funnelStages = [
+    { label: 'Prospecting', count: stages.prospecting, color: '#4f8cff' },
+    { label: 'Discovery', count: stages.discovery, color: '#a78bfa' },
+    { label: 'Proposal', count: stages.proposal, color: '#22d3ee' },
+    { label: 'Negotiation', count: stages.negotiation, color: '#fbbf24' },
+    { label: 'Closed Won', count: stages.closedWon, color: '#34d399' }
+  ];
+  let funnelHTML = '';
+  funnelStages.forEach(s => {
+    const w = Math.max(8, (s.count / maxDeals) * 100);
+    funnelHTML += `
+      <div class="funnel-bar-row">
+        <div class="funnel-bar-label">${s.label}</div>
+        <div class="funnel-bar-track">
+          <div class="funnel-bar-fill" style="width:${w}%; background:${s.color}">${s.count}</div>
+        </div>
+      </div>`;
+  });
+  document.getElementById('funnelBars').innerHTML = funnelHTML;
+
+  // Conversion Table
+  const conversions = [
+    { name: 'Prospect → Discovery', rate: convProspToDisc, bench: benchmarks.prospToDisc },
+    { name: 'Discovery → Proposal', rate: convDiscToProp, bench: benchmarks.discToProp },
+    { name: 'Proposal → Negotiation', rate: convPropToNeg, bench: benchmarks.propToNeg },
+    { name: 'Negotiation → Won', rate: convNegToWon, bench: benchmarks.negToClose }
+  ];
+  let convHTML = '';
+  conversions.forEach(c => {
+    const gap = c.rate - c.bench;
+    const rateClass = gap >= 0 ? 'good' : (gap > -0.1 ? 'warn' : 'bad');
+    const gapClass = gap >= 0 ? 'good' : (gap > -0.1 ? 'warn' : 'bad');
+    convHTML += `
+      <tr>
+        <td>${c.name}</td>
+        <td><span class="rate-badge ${rateClass}">${pct(c.rate)}</span></td>
+        <td style="color:var(--text-muted)">${pct(c.bench)}</td>
+        <td><span class="rate-badge ${gapClass}">${gap >= 0 ? '+' : ''}${(gap * 100).toFixed(1)}pp</span></td>
+      </tr>`;
+  });
+  document.getElementById('conversionBody').innerHTML = convHTML;
+
+  // Top vs Bottom Funnel Chart
+  if (funnelCompareInstance) funnelCompareInstance.destroy();
+  funnelCompareInstance = new Chart(document.getElementById('funnelCompareChart'), {
+    type: 'bar',
+    data: {
+      labels: ['Top of Funnel', 'Bottom of Funnel'],
+      datasets: [
+        {
+          label: 'Actual',
+          data: [topOfFunnel * 100, bottomOfFunnel * 100],
+          backgroundColor: ['rgba(79,140,255,0.8)', 'rgba(34,211,153,0.8)'],
+          borderRadius: 6,
+          borderSkipped: false
+        },
+        {
+          label: 'Benchmark',
+          data: [benchmarks.prospToDisc * benchmarks.discToProp * 100, benchmarks.propToNeg * benchmarks.negToClose * 100],
+          backgroundColor: ['rgba(79,140,255,0.25)', 'rgba(34,211,153,0.25)'],
+          borderRadius: 6,
+          borderSkipped: false
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { labels: { color: '#9aa0b0', font: { size: 11 } } }
+      },
+      scales: {
+        x: { grid: { display: false }, ticks: { color: '#636a7e' } },
+        y: {
+          grid: { color: 'rgba(42,46,61,0.5)' },
+          ticks: { color: '#636a7e', callback: v => v + '%' },
+          max: Math.max(60, Math.ceil((Math.max(topOfFunnel, bottomOfFunnel) * 100 + 10) / 10) * 10)
+        }
+      }
+    }
+  });
+
+  const tofBench = benchmarks.prospToDisc * benchmarks.discToProp;
+  const bofBench = benchmarks.propToNeg * benchmarks.negToClose;
+  let funnelInsight = '';
+  if (topOfFunnel < tofBench * 0.85 && bottomOfFunnel >= bofBench * 0.85) {
+    funnelInsight = '<strong style="color:var(--accent-yellow)">Top-of-funnel bottleneck detected.</strong> Conversion from Prospecting to Proposal is lagging. Focus on lead qualification, SDR effectiveness, and discovery call quality.';
+  } else if (bottomOfFunnel < bofBench * 0.85 && topOfFunnel >= tofBench * 0.85) {
+    funnelInsight = '<strong style="color:var(--accent-yellow)">Bottom-of-funnel bottleneck detected.</strong> Deals stall after Proposal. Investigate pricing, competitive losses, champion alignment, and negotiation process.';
+  } else if (topOfFunnel < tofBench * 0.85 && bottomOfFunnel < bofBench * 0.85) {
+    funnelInsight = '<strong style="color:var(--accent-red)">Full-funnel conversion gap.</strong> Both top and bottom of funnel are underperforming benchmarks. Requires systemic review of ICP targeting, sales methodology, and deal management.';
+  } else {
+    funnelInsight = '<strong style="color:var(--accent-green)">Funnel conversion rates are within healthy range</strong> for both top and bottom of funnel vs. benchmarks.';
+  }
+  document.getElementById('funnelCompareInsight').innerHTML = funnelInsight;
+
+  // Gauge Chart (Coverage & Velocity targets)
+  if (gaugeChartInstance) gaugeChartInstance.destroy();
+  const projectedClose = velocity * daysLeft;
+  const quotaGap = quota - (stages.closedWon * avgDeal) - weightedPipeline;
+  gaugeChartInstance = new Chart(document.getElementById('gaugeChart'), {
+    type: 'bar',
+    data: {
+      labels: ['Coverage Ratio', 'Weighted / Quota', 'Velocity Projection', 'Win Rate'],
+      datasets: [
+        {
+          label: 'Actual',
+          data: [
+            Math.min(coverageRatio / 4 * 100, 100),
+            Math.min(weightedPipeline / quota * 100, 100),
+            Math.min(projectedClose / quota * 100, 100),
+            Math.min(winRate / 0.4 * 100, 100)
+          ],
+          backgroundColor: [
+            coverageRatio >= 3 ? 'rgba(52,211,153,0.8)' : coverageRatio >= 2 ? 'rgba(251,191,36,0.8)' : 'rgba(248,113,113,0.8)',
+            weightedPipeline / quota >= 0.8 ? 'rgba(52,211,153,0.8)' : 'rgba(251,191,36,0.8)',
+            projectedClose / quota >= 0.8 ? 'rgba(52,211,153,0.8)' : projectedClose / quota >= 0.5 ? 'rgba(251,191,36,0.8)' : 'rgba(248,113,113,0.8)',
+            winRate >= 0.25 ? 'rgba(52,211,153,0.8)' : 'rgba(251,191,36,0.8)'
+          ],
+          borderRadius: 6,
+          borderSkipped: false
+        }
+      ]
+    },
+    options: {
+      indexAxis: 'y',
+      responsive: true,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: (ctx) => {
+              const labels = [
+                `${coverageRatio.toFixed(1)}x (target: 3x)`,
+                `${pct(weightedPipeline / quota)} (target: 80%+)`,
+                `${fmt(projectedClose)} (target: ${fmt(quota)})`,
+                `${pct(winRate)} (target: 25%+)`
+              ];
+              return labels[ctx.dataIndex];
+            }
+          }
+        }
+      },
+      scales: {
+        x: {
+          max: 100,
+          grid: { color: 'rgba(42,46,61,0.5)' },
+          ticks: { color: '#636a7e', callback: v => v + '%' }
+        },
+        y: { grid: { display: false }, ticks: { color: '#9aa0b0', font: { size: 11 } } }
+      }
+    }
+  });
+
+  // CRO Insights
+  let insights = [];
+
+  if (coverageRatio < 2) {
+    insights.push({ type: 'critical', icon: '🚨', text: `Pipeline coverage at ${coverageRatio.toFixed(1)}x is critically low. Need 3x minimum for predictable attainment. Gap: ${fmt(quota * 3 - totalPipeline)} in new pipeline required.` });
+  } else if (coverageRatio < 3) {
+    insights.push({ type: 'warning', icon: '⚠️', text: `Pipeline coverage at ${coverageRatio.toFixed(1)}x is below the 3x target. ${fmt(quota * 3 - totalPipeline)} additional pipeline needed for comfortable coverage.` });
+  } else {
+    insights.push({ type: 'positive', icon: '✅', text: `Pipeline coverage at ${coverageRatio.toFixed(1)}x exceeds the 3x target. Volume is healthy.` });
+  }
+
+  if (projectedClose < quota * 0.8) {
+    insights.push({ type: 'critical', icon: '🚨', text: `Velocity projects ${fmt(projectedClose)} in remaining ${daysLeft} days — ${pct(1 - projectedClose / quota)} short of quota. Accelerate late-stage deals or pull in new high-value opps.` });
+  }
+
+  if (convNegToWon < benchmarks.negToClose * 0.8) {
+    insights.push({ type: 'warning', icon: '⚠️', text: `Negotiation → Won conversion (${pct(convNegToWon)}) is significantly below benchmark (${pct(benchmarks.negToClose)}). Review pricing strategy, competitive positioning, and champion enablement for late-stage deals.` });
+  }
+
+  if (convProspToDisc < benchmarks.prospToDisc * 0.8) {
+    insights.push({ type: 'warning', icon: '⚠️', text: `Prospecting → Discovery conversion (${pct(convProspToDisc)}) is below benchmark. Assess outbound messaging, ICP targeting, and SDR-to-AE handoff quality.` });
+  }
+
+  const avgDaysPerDeal = salesCycle;
+  if (avgDaysPerDeal > daysLeft && stages.negotiation < 10) {
+    insights.push({ type: 'warning', icon: '⏱', text: `Average sales cycle (${avgDaysPerDeal}d) exceeds days remaining (${daysLeft}d) with only ${stages.negotiation} deals in negotiation. Focus on accelerating late-stage or identifying pull-forward candidates.` });
+  }
+
+  if (winRate >= 0.25) {
+    insights.push({ type: 'positive', icon: '✅', text: `Win rate at ${pct(winRate)} is at or above the 25% benchmark. Execution quality is strong.` });
+  } else if (winRate >= 0.18) {
+    insights.push({ type: 'info', icon: 'ℹ️', text: `Win rate at ${pct(winRate)} is slightly below the 25% benchmark. Small improvements in qualification and competitive strategy can close this gap.` });
+  } else {
+    insights.push({ type: 'critical', icon: '🚨', text: `Win rate at ${pct(winRate)} is well below the 25% benchmark. This signals a qualification or product-market fit issue. Urgent review needed.` });
+  }
+
+  if (stages.prospecting > 0 && stages.negotiation > 0) {
+    const pipelineShape = stages.prospecting / stages.negotiation;
+    if (pipelineShape > 12) {
+      insights.push({ type: 'info', icon: 'ℹ️', text: `Pipeline shape is very top-heavy (${pipelineShape.toFixed(0)}:1 prospecting to negotiation). Heavy early-stage volume but low conversion to late-stage. Prioritize qualification rigor.` });
+    } else if (pipelineShape < 4) {
+      insights.push({ type: 'warning', icon: '⚠️', text: `Pipeline shape is bottom-heavy (${pipelineShape.toFixed(0)}:1). Low top-of-funnel will create a coverage gap in 1-2 quarters. Ramp up prospecting activity now.` });
+    }
+  }
+
+  let insightsHTML = '';
+  insights.forEach(i => {
+    insightsHTML += `<div class="insight-item ${i.type}"><span class="insight-icon">${i.icon}</span><span>${i.text}</span></div>`;
+  });
+  document.getElementById('insightsList').innerHTML = insightsHTML;
+
+  // Update timestamp
+  document.getElementById('lastUpdated').textContent = 'Updated: ' + new Date().toLocaleString();
+
+  // Collapse inputs after calculate
+  document.getElementById('inputPanel').style.display = 'none';
+}
+
+// Auto-format currency inputs
+['quota', 'totalPipeline', 'avgDeal'].forEach(id => {
+  document.getElementById(id).addEventListener('blur', function() {
+    const raw = this.value.replace(/[,$\s]/g, '');
+    const num = parseFloat(raw);
+    if (!isNaN(num)) {
+      this.value = num.toLocaleString('en-US');
+    }
+  });
+});
+
+// Run on load
+calculate();
+</script>
+</body>
+</html>
