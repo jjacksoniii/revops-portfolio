@@ -25,6 +25,8 @@
             --yellow-dim: #3d2600;
             --red: #ef4444;
             --red-dim: #3b0d0d;
+            --purple: #8b5cf6;
+            --purple-dim: #1e133a;
         }
 
         body {
@@ -41,89 +43,38 @@
             border-bottom: 1px solid var(--border);
             padding: 28px 36px 22px;
         }
-
         .header-top {
             display: flex;
             align-items: flex-start;
             justify-content: space-between;
             margin-bottom: 18px;
         }
-
-        .header-left h1 {
-            font-size: 20px;
-            font-weight: 700;
-            letter-spacing: -0.4px;
-            color: var(--text-primary);
-        }
-
-        .header-left p {
-            font-size: 13px;
-            color: var(--text-secondary);
-            margin-top: 4px;
-        }
-
-        .header-badges {
-            display: flex;
-            gap: 8px;
-            align-items: center;
-        }
+        .header-left h1 { font-size: 20px; font-weight: 700; letter-spacing: -0.4px; }
+        .header-left p  { font-size: 13px; color: var(--text-secondary); margin-top: 4px; }
+        .header-badges  { display: flex; gap: 8px; align-items: center; }
 
         .badge {
-            font-size: 11px;
-            font-weight: 600;
-            padding: 4px 10px;
-            border-radius: 20px;
-            letter-spacing: 0.4px;
-            text-transform: uppercase;
+            font-size: 11px; font-weight: 600; padding: 4px 10px;
+            border-radius: 20px; letter-spacing: 0.4px; text-transform: uppercase;
         }
+        .badge-blue  { background: var(--accent-dim); color: var(--accent); border: 1px solid #1e3a6e; }
+        .badge-green { background: var(--green-dim);  color: var(--green);  border: 1px solid #0a4a30; }
 
-        .badge-blue {
-            background: var(--accent-dim);
-            color: var(--accent);
-            border: 1px solid #1e3a6e;
-        }
-
-        .badge-green {
-            background: var(--green-dim);
-            color: var(--green);
-            border: 1px solid #0a4a30;
-        }
-
-        /* Stage Selector */
-        .stage-selector {
-            display: flex;
-            gap: 6px;
-        }
-
+        .stage-selector { display: flex; gap: 6px; }
         .stage-btn {
-            background: transparent;
-            border: 1px solid var(--border);
-            color: var(--text-muted);
-            font-size: 12px;
-            font-weight: 500;
-            padding: 6px 16px;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: all 0.15s;
-            letter-spacing: 0.2px;
+            background: transparent; border: 1px solid var(--border);
+            color: var(--text-muted); font-size: 12px; font-weight: 500;
+            padding: 6px 16px; border-radius: 6px; cursor: pointer;
+            transition: all 0.15s; letter-spacing: 0.2px; font-family: inherit;
+        }
+        .stage-btn:hover, .stage-btn.active {
+            background: var(--accent-dim); border-color: var(--accent); color: var(--accent);
         }
 
-        .stage-btn:hover {
-            border-color: var(--accent);
-            color: var(--accent);
-            background: var(--accent-dim);
-        }
-
-        .stage-btn.active {
-            background: var(--accent-dim);
-            border-color: var(--accent);
-            color: var(--accent);
-        }
-
-        /* ── MAIN GRID ── */
+        /* ── LAYOUT ── */
         .main {
             display: grid;
-            grid-template-columns: 300px 1fr;
+            grid-template-columns: 310px 1fr;
             min-height: calc(100vh - 108px - 44px);
         }
 
@@ -131,49 +82,36 @@
         .inputs-panel {
             background: var(--bg-card);
             border-right: 1px solid var(--border);
-            padding: 24px 20px;
+            padding: 24px 18px;
             overflow-y: auto;
         }
-
-        .input-section {
-            margin-bottom: 26px;
-        }
-
+        .input-section { margin-bottom: 24px; }
         .section-label {
-            font-size: 10px;
-            font-weight: 700;
-            letter-spacing: 1.2px;
-            text-transform: uppercase;
-            color: var(--text-muted);
-            margin-bottom: 14px;
-            padding-bottom: 8px;
+            font-size: 10px; font-weight: 700; letter-spacing: 1.2px;
+            text-transform: uppercase; color: var(--text-muted);
+            margin-bottom: 12px; padding-bottom: 8px;
             border-bottom: 1px solid var(--border);
         }
-
-        .input-group {
-            margin-bottom: 12px;
-        }
-
+        .input-group { margin-bottom: 10px; }
         .input-label {
-            font-size: 12px;
-            color: var(--text-secondary);
-            margin-bottom: 5px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+            font-size: 12px; color: var(--text-secondary);
+            margin-bottom: 4px; display: flex;
+            justify-content: space-between; align-items: center;
         }
+        .input-hint { color: var(--text-muted); font-size: 10px; }
 
-        .input-hint {
-            color: var(--text-muted);
-            font-size: 10px;
-        }
-
+        /* Wrapper: prefix + input + optional unit toggle */
         .input-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .input-inner {
             position: relative;
+            flex: 1;
             display: flex;
             align-items: center;
         }
-
         .input-prefix, .input-suffix {
             position: absolute;
             color: var(--text-muted);
@@ -181,7 +119,6 @@
             pointer-events: none;
             z-index: 1;
         }
-
         .input-prefix { left: 10px; }
         .input-suffix { right: 10px; }
 
@@ -198,60 +135,70 @@
             transition: border-color 0.15s;
             -moz-appearance: textfield;
         }
-
         input[type="number"]::-webkit-outer-spin-button,
         input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; }
-
         input[type="number"]:focus { border-color: var(--accent); }
+        input[type="number"].no-prefix { padding-left: 10px; }
         input[type="number"].has-suffix { padding-right: 26px; }
 
-        /* ── OUTPUTS ── */
-        .outputs-panel {
-            padding: 24px 28px;
-            overflow-y: auto;
+        /* ── UNIT TOGGLE ── */
+        .unit-toggle {
+            display: flex;
+            border: 1px solid var(--border);
+            border-radius: 5px;
+            overflow: hidden;
+            flex-shrink: 0;
         }
+        .unit-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            font-size: 10px;
+            font-weight: 700;
+            padding: 0 9px;
+            height: 31px;
+            cursor: pointer;
+            transition: all 0.12s;
+            font-family: inherit;
+            letter-spacing: 0.3px;
+            border-right: 1px solid var(--border);
+        }
+        .unit-btn:last-child { border-right: none; }
+        .unit-btn.active { background: var(--accent-dim); color: var(--accent); }
+        .unit-btn:hover:not(.active) { background: var(--bg-input); color: var(--text-secondary); }
+
+        /* ── OUTPUTS ── */
+        .outputs-panel { padding: 24px 28px; overflow-y: auto; }
 
         /* Executive Summary */
         .exec-summary {
             background: linear-gradient(135deg, #0c1428 0%, #101b35 100%);
-            border: 1px solid #1e3a6e;
-            border-radius: 10px;
-            padding: 16px 20px;
-            margin-bottom: 20px;
+            border: 1px solid #1e3a6e; border-radius: 10px;
+            padding: 16px 20px; margin-bottom: 20px;
         }
-
-        .exec-summary-header {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin-bottom: 10px;
-        }
-
+        .exec-summary-header { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
         .exec-summary-label {
-            font-size: 10px;
-            font-weight: 700;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-            color: var(--accent);
+            font-size: 10px; font-weight: 700; letter-spacing: 1px;
+            text-transform: uppercase; color: var(--accent);
         }
-
         .health-badge {
-            font-size: 10px;
-            font-weight: 600;
-            padding: 2px 8px;
-            border-radius: 10px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
+            font-size: 10px; font-weight: 600; padding: 2px 8px;
+            border-radius: 10px; text-transform: uppercase; letter-spacing: 0.5px;
         }
-
-        .health-badge.green { background: var(--green-dim); color: var(--green); border: 1px solid #0a4a30; }
+        .health-badge.green  { background: var(--green-dim);  color: var(--green);  border: 1px solid #0a4a30; }
         .health-badge.yellow { background: var(--yellow-dim); color: var(--yellow); border: 1px solid #5a3a00; }
-        .health-badge.red { background: var(--red-dim); color: var(--red); border: 1px solid #5a1a1a; }
+        .health-badge.red    { background: var(--red-dim);    color: var(--red);    border: 1px solid #5a1a1a; }
+        .exec-summary p { font-size: 13px; color: var(--text-primary); line-height: 1.65; }
 
-        .exec-summary p {
-            font-size: 13px;
-            color: var(--text-primary);
-            line-height: 1.65;
+        /* Section dividers */
+        .section-divider {
+            font-size: 10px; font-weight: 700; letter-spacing: 1px;
+            text-transform: uppercase; color: var(--text-muted);
+            margin-bottom: 12px;
+            display: flex; align-items: center; gap: 10px;
+        }
+        .section-divider::after {
+            content: ''; flex: 1; height: 1px; background: var(--border);
         }
 
         /* Metrics Grid */
@@ -271,135 +218,74 @@
             overflow: hidden;
             transition: border-color 0.2s;
         }
-
         .metric-card::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; right: 0;
-            height: 2px;
+            content: ''; position: absolute;
+            top: 0; left: 0; right: 0; height: 2px;
         }
-
         .metric-card:hover { border-color: var(--border-light); }
-
-        .metric-card.green::before { background: linear-gradient(90deg, var(--green), #34d399); }
+        .metric-card.green::before  { background: linear-gradient(90deg, var(--green),  #34d399); }
         .metric-card.yellow::before { background: linear-gradient(90deg, var(--yellow), #fbbf24); }
-        .metric-card.red::before { background: linear-gradient(90deg, var(--red), #f87171); }
+        .metric-card.red::before    { background: linear-gradient(90deg, var(--red),    #f87171); }
+        .metric-card.purple::before { background: linear-gradient(90deg, var(--purple), #a78bfa); }
         .metric-card.neutral::before { background: var(--border); }
 
         .metric-name {
-            font-size: 10px;
-            font-weight: 600;
-            color: var(--text-muted);
-            letter-spacing: 0.8px;
-            text-transform: uppercase;
-            margin-bottom: 10px;
+            font-size: 10px; font-weight: 600; color: var(--text-muted);
+            letter-spacing: 0.8px; text-transform: uppercase; margin-bottom: 10px;
         }
-
         .metric-value {
-            font-size: 26px;
-            font-weight: 700;
-            letter-spacing: -0.5px;
-            margin-bottom: 5px;
-            line-height: 1;
+            font-size: 26px; font-weight: 700;
+            letter-spacing: -0.5px; margin-bottom: 5px; line-height: 1;
         }
-
-        .metric-card.green .metric-value { color: var(--green); }
+        .metric-card.green  .metric-value { color: var(--green); }
         .metric-card.yellow .metric-value { color: var(--yellow); }
-        .metric-card.red .metric-value { color: var(--red); }
+        .metric-card.red    .metric-value { color: var(--red); }
+        .metric-card.purple .metric-value { color: var(--purple); }
         .metric-card.neutral .metric-value { color: var(--text-secondary); }
 
-        .metric-status {
-            font-size: 11px;
-            font-weight: 500;
-            margin-bottom: 5px;
-        }
-
-        .metric-card.green .metric-status { color: var(--green); }
+        .metric-status { font-size: 11px; font-weight: 500; margin-bottom: 5px; }
+        .metric-card.green  .metric-status { color: var(--green); }
         .metric-card.yellow .metric-status { color: var(--yellow); }
-        .metric-card.red .metric-status { color: var(--red); }
-
-        .metric-benchmark {
-            font-size: 11px;
-            color: var(--text-muted);
-        }
+        .metric-card.red    .metric-status { color: var(--red); }
+        .metric-card.purple .metric-status { color: var(--purple); }
+        .metric-benchmark { font-size: 11px; color: var(--text-muted); }
 
         /* Bottom Grid */
-        .bottom-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 14px;
-        }
-
+        .bottom-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
         .chart-card, .actions-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            padding: 20px;
+            background: var(--bg-card); border: 1px solid var(--border);
+            border-radius: 10px; padding: 20px;
         }
-
         .card-title {
-            font-size: 10px;
-            font-weight: 700;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-            color: var(--text-muted);
-            margin-bottom: 16px;
+            font-size: 10px; font-weight: 700; letter-spacing: 1px;
+            text-transform: uppercase; color: var(--text-muted); margin-bottom: 16px;
         }
+        .chart-container { height: 210px; position: relative; }
 
-        .chart-container {
-            height: 210px;
-            position: relative;
-        }
-
-        /* Action Items */
         .action-item {
-            display: flex;
-            align-items: flex-start;
-            gap: 10px;
-            padding: 10px 0;
-            border-bottom: 1px solid var(--border);
+            display: flex; align-items: flex-start; gap: 10px;
+            padding: 10px 0; border-bottom: 1px solid var(--border);
         }
-
         .action-item:last-child { border-bottom: none; }
-
         .action-dot {
-            width: 6px;
-            height: 6px;
-            border-radius: 50%;
-            margin-top: 5px;
-            flex-shrink: 0;
+            width: 6px; height: 6px; border-radius: 50%;
+            margin-top: 5px; flex-shrink: 0;
         }
-
-        .action-dot.red { background: var(--red); box-shadow: 0 0 6px rgba(239,68,68,0.4); }
+        .action-dot.red    { background: var(--red);    box-shadow: 0 0 6px rgba(239,68,68,0.4); }
         .action-dot.yellow { background: var(--yellow); box-shadow: 0 0 6px rgba(245,158,11,0.4); }
-        .action-dot.green { background: var(--green); box-shadow: 0 0 6px rgba(16,185,129,0.4); }
-
-        .action-text {
-            font-size: 12px;
-            color: var(--text-secondary);
-            line-height: 1.55;
-        }
+        .action-dot.green  { background: var(--green);  box-shadow: 0 0 6px rgba(16,185,129,0.4); }
+        .action-dot.purple { background: var(--purple); box-shadow: 0 0 6px rgba(139,92,246,0.4); }
+        .action-text { font-size: 12px; color: var(--text-secondary); line-height: 1.55; }
 
         /* ── FOOTER ── */
         .footer {
-            text-align: center;
-            padding: 14px;
-            font-size: 12px;
-            color: var(--text-muted);
+            text-align: center; padding: 14px;
+            font-size: 12px; color: var(--text-muted);
             border-top: 1px solid var(--border);
         }
-
-        .footer a {
-            color: var(--accent);
-            text-decoration: none;
-        }
-
+        .footer a { color: var(--accent); text-decoration: none; }
         .footer a:hover { text-decoration: underline; }
 
-        /* Tooltip */
-        .metric-card [title] { cursor: help; }
-
-        /* Responsive */
         @media (max-width: 900px) {
             .main { grid-template-columns: 1fr; }
             .inputs-panel { border-right: none; border-bottom: 1px solid var(--border); }
@@ -442,32 +328,48 @@
             <div class="input-group">
                 <div class="input-label">Current ARR <span class="input-hint">Annual</span></div>
                 <div class="input-wrapper">
-                    <span class="input-prefix">$</span>
-                    <input type="number" id="arr" value="25000000" min="0">
+                    <div class="input-inner">
+                        <span class="input-prefix">$</span>
+                        <input type="number" id="arr" value="25" min="0">
+                    </div>
+                    <div class="unit-toggle" id="arr-toggle">
+                        <button class="unit-btn active" data-mult="1000000">M</button>
+                        <button class="unit-btn" data-mult="1000">K</button>
+                    </div>
                 </div>
             </div>
 
             <div class="input-group">
                 <div class="input-label">New ARR Added <span class="input-hint">Last 12 mo</span></div>
                 <div class="input-wrapper">
-                    <span class="input-prefix">$</span>
-                    <input type="number" id="newArr" value="8000000" min="0">
+                    <div class="input-inner">
+                        <span class="input-prefix">$</span>
+                        <input type="number" id="newArr" value="8" min="0">
+                    </div>
+                    <div class="unit-toggle" id="newArr-toggle">
+                        <button class="unit-btn active" data-mult="1000000">M</button>
+                        <button class="unit-btn" data-mult="1000">K</button>
+                    </div>
                 </div>
             </div>
 
             <div class="input-group">
                 <div class="input-label">Gross Margin</div>
                 <div class="input-wrapper">
-                    <input type="number" id="grossMargin" value="75" min="0" max="100" class="has-suffix">
-                    <span class="input-suffix">%</span>
+                    <div class="input-inner">
+                        <input type="number" id="grossMargin" value="75" min="0" max="100" class="no-prefix has-suffix">
+                        <span class="input-suffix">%</span>
+                    </div>
                 </div>
             </div>
 
             <div class="input-group">
                 <div class="input-label">Net Revenue Retention</div>
                 <div class="input-wrapper">
-                    <input type="number" id="nrr" value="108" min="0" max="200" class="has-suffix">
-                    <span class="input-suffix">%</span>
+                    <div class="input-inner">
+                        <input type="number" id="nrr" value="108" min="0" max="200" class="no-prefix has-suffix">
+                        <span class="input-suffix">%</span>
+                    </div>
                 </div>
             </div>
         </div>
@@ -478,32 +380,82 @@
             <div class="input-group">
                 <div class="input-label">S&M Spend <span class="input-hint">Fully-loaded annual</span></div>
                 <div class="input-wrapper">
-                    <span class="input-prefix">$</span>
-                    <input type="number" id="smSpend" value="12000000" min="0">
+                    <div class="input-inner">
+                        <span class="input-prefix">$</span>
+                        <input type="number" id="smSpend" value="12" min="0">
+                    </div>
+                    <div class="unit-toggle" id="smSpend-toggle">
+                        <button class="unit-btn active" data-mult="1000000">M</button>
+                        <button class="unit-btn" data-mult="1000">K</button>
+                    </div>
                 </div>
             </div>
 
             <div class="input-group">
-                <div class="input-label">S&M Headcount</div>
+                <div class="input-label">S&M Headcount <span class="input-hint">Total</span></div>
                 <div class="input-wrapper">
-                    <span class="input-prefix">#</span>
-                    <input type="number" id="smHeadcount" value="30" min="1">
+                    <div class="input-inner">
+                        <span class="input-prefix">#</span>
+                        <input type="number" id="smHeadcount" value="30" min="1">
+                    </div>
+                </div>
+            </div>
+
+            <div class="input-group">
+                <div class="input-label">AE Headcount <span class="input-hint">Quota-carrying</span></div>
+                <div class="input-wrapper">
+                    <div class="input-inner">
+                        <span class="input-prefix">#</span>
+                        <input type="number" id="aeHeadcount" value="18" min="1">
+                    </div>
+                </div>
+            </div>
+
+            <div class="input-group">
+                <div class="input-label">Avg AE OTE <span class="input-hint">Annual</span></div>
+                <div class="input-wrapper">
+                    <div class="input-inner">
+                        <span class="input-prefix">$</span>
+                        <input type="number" id="aeOte" value="200" min="0">
+                    </div>
+                    <div class="unit-toggle" id="aeOte-toggle">
+                        <button class="unit-btn" data-mult="1000000">M</button>
+                        <button class="unit-btn active" data-mult="1000">K</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="input-group">
+                <div class="input-label">Avg AE Attainment</div>
+                <div class="input-wrapper">
+                    <div class="input-inner">
+                        <input type="number" id="attainment" value="78" min="0" max="200" class="no-prefix has-suffix">
+                        <span class="input-suffix">%</span>
+                    </div>
                 </div>
             </div>
 
             <div class="input-group">
                 <div class="input-label">New Customers Won <span class="input-hint">Last 12 mo</span></div>
                 <div class="input-wrapper">
-                    <span class="input-prefix">#</span>
-                    <input type="number" id="newCustomers" value="45" min="1">
+                    <div class="input-inner">
+                        <span class="input-prefix">#</span>
+                        <input type="number" id="newCustomers" value="45" min="1">
+                    </div>
                 </div>
             </div>
 
             <div class="input-group">
                 <div class="input-label">Avg Contract Value <span class="input-hint">ACV</span></div>
                 <div class="input-wrapper">
-                    <span class="input-prefix">$</span>
-                    <input type="number" id="acv" value="35000" min="0">
+                    <div class="input-inner">
+                        <span class="input-prefix">$</span>
+                        <input type="number" id="acv" value="35" min="0">
+                    </div>
+                    <div class="unit-toggle" id="acv-toggle">
+                        <button class="unit-btn" data-mult="1000000">M</button>
+                        <button class="unit-btn active" data-mult="1000">K</button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -514,16 +466,24 @@
             <div class="input-group">
                 <div class="input-label">Total Headcount</div>
                 <div class="input-wrapper">
-                    <span class="input-prefix">#</span>
-                    <input type="number" id="totalHeadcount" value="120" min="1">
+                    <div class="input-inner">
+                        <span class="input-prefix">#</span>
+                        <input type="number" id="totalHeadcount" value="120" min="1">
+                    </div>
                 </div>
             </div>
 
             <div class="input-group">
                 <div class="input-label">GTM Tech Spend <span class="input-hint">Annual total</span></div>
                 <div class="input-wrapper">
-                    <span class="input-prefix">$</span>
-                    <input type="number" id="techSpend" value="800000" min="0">
+                    <div class="input-inner">
+                        <span class="input-prefix">$</span>
+                        <input type="number" id="techSpend" value="800" min="0">
+                    </div>
+                    <div class="unit-toggle" id="techSpend-toggle">
+                        <button class="unit-btn" data-mult="1000000">M</button>
+                        <button class="unit-btn active" data-mult="1000">K</button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -533,7 +493,6 @@
     <!-- OUTPUTS -->
     <div class="outputs-panel">
 
-        <!-- Executive Summary -->
         <div class="exec-summary">
             <div class="exec-summary-header">
                 <div class="exec-summary-label">Executive Summary</div>
@@ -542,8 +501,13 @@
             <p id="summaryText">Calculating...</p>
         </div>
 
-        <!-- Metrics -->
+        <!-- GTM Efficiency Metrics -->
+        <div class="section-divider">GTM Efficiency</div>
         <div class="metrics-grid" id="metricsGrid"></div>
+
+        <!-- Rep Productivity -->
+        <div class="section-divider">Rep Productivity</div>
+        <div class="metrics-grid" id="repGrid"></div>
 
         <!-- Bottom: Radar + Actions -->
         <div class="bottom-grid">
@@ -563,7 +527,6 @@
 
 </div><!-- /main -->
 
-<!-- FOOTER -->
 <div class="footer">
     James Jackson &nbsp;·&nbsp; RevOps Portfolio &nbsp;·&nbsp;
     <a href="https://www.linkedin.com/in/jamesrjacksoniii" target="_blank">LinkedIn</a>
@@ -572,45 +535,52 @@
 
 <script>
 // ─────────────────────────────────────────────
-// BENCHMARK DATA BY ARR STAGE
-// higher = better unless noted (lowerBetter: true)
+// BENCHMARKS
 // ─────────────────────────────────────────────
 const BENCHMARKS = {
     early: {
         label: '$0–10M ARR',
-        magicNumber:          { excellent:1.5, good:1.0,  ok:0.7,  poor:0.4,  lowerBetter:false, fmt:'x'      },
-        gtmEfficiency:        { excellent:1.2, good:0.8,  ok:0.5,  poor:0.3,  lowerBetter:false, fmt:'x'      },
-        cacPayback:           { excellent:12,  good:18,   ok:24,   poor:36,   lowerBetter:true,  fmt:'mo'     },
-        ltvCac:               { excellent:7,   good:5,    ok:3,    poor:2,    lowerBetter:false, fmt:'x'      },
-        nrr:                  { excellent:115, good:105,  ok:95,   poor:85,   lowerBetter:false, fmt:'pct'    },
-        revenuePerEmployee:   { excellent:250000, good:175000, ok:125000, poor:85000, lowerBetter:false, fmt:'dollar' },
+        magicNumber:        { excellent:1.5, good:1.0, ok:0.7, poor:0.4, lowerBetter:false, fmt:'x'      },
+        gtmEfficiency:      { excellent:1.2, good:0.8, ok:0.5, poor:0.3, lowerBetter:false, fmt:'x'      },
+        cacPayback:         { excellent:12,  good:18,  ok:24,  poor:36,  lowerBetter:true,  fmt:'mo'     },
+        ltvCac:             { excellent:7,   good:5,   ok:3,   poor:2,   lowerBetter:false, fmt:'x'      },
+        nrr:                { excellent:115, good:105, ok:95,  poor:85,  lowerBetter:false, fmt:'pct'    },
+        revenuePerEmployee: { excellent:250000, good:175000, ok:125000, poor:85000, lowerBetter:false, fmt:'dollar' },
+        quotaOte:           { excellent:5,   good:4,   ok:3,   poor:2.5, lowerBetter:false, fmt:'x'      },
+        attainment:         { excellent:80,  good:70,  ok:60,  poor:50,  lowerBetter:false, fmt:'pct'    },
     },
     growth: {
         label: '$10–50M ARR',
-        magicNumber:          { excellent:1.5, good:1.0,  ok:0.7,  poor:0.4,  lowerBetter:false, fmt:'x'      },
-        gtmEfficiency:        { excellent:1.2, good:0.8,  ok:0.5,  poor:0.3,  lowerBetter:false, fmt:'x'      },
-        cacPayback:           { excellent:14,  good:20,   ok:28,   poor:40,   lowerBetter:true,  fmt:'mo'     },
-        ltvCac:               { excellent:7,   good:5,    ok:3,    poor:2,    lowerBetter:false, fmt:'x'      },
-        nrr:                  { excellent:120, good:110,  ok:100,  poor:90,   lowerBetter:false, fmt:'pct'    },
-        revenuePerEmployee:   { excellent:350000, good:250000, ok:175000, poor:120000, lowerBetter:false, fmt:'dollar' },
+        magicNumber:        { excellent:1.5, good:1.0, ok:0.7, poor:0.4, lowerBetter:false, fmt:'x'      },
+        gtmEfficiency:      { excellent:1.2, good:0.8, ok:0.5, poor:0.3, lowerBetter:false, fmt:'x'      },
+        cacPayback:         { excellent:14,  good:20,  ok:28,  poor:40,  lowerBetter:true,  fmt:'mo'     },
+        ltvCac:             { excellent:7,   good:5,   ok:3,   poor:2,   lowerBetter:false, fmt:'x'      },
+        nrr:                { excellent:120, good:110, ok:100, poor:90,  lowerBetter:false, fmt:'pct'    },
+        revenuePerEmployee: { excellent:350000, good:250000, ok:175000, poor:120000, lowerBetter:false, fmt:'dollar' },
+        quotaOte:           { excellent:5,   good:4,   ok:3,   poor:2.5, lowerBetter:false, fmt:'x'      },
+        attainment:         { excellent:80,  good:70,  ok:60,  poor:50,  lowerBetter:false, fmt:'pct'    },
     },
     scale: {
         label: '$50–200M ARR',
-        magicNumber:          { excellent:1.5, good:1.0,  ok:0.7,  poor:0.4,  lowerBetter:false, fmt:'x'      },
-        gtmEfficiency:        { excellent:1.2, good:0.8,  ok:0.5,  poor:0.3,  lowerBetter:false, fmt:'x'      },
-        cacPayback:           { excellent:16,  good:22,   ok:30,   poor:45,   lowerBetter:true,  fmt:'mo'     },
-        ltvCac:               { excellent:8,   good:5,    ok:3,    poor:2,    lowerBetter:false, fmt:'x'      },
-        nrr:                  { excellent:125, good:115,  ok:105,  poor:95,   lowerBetter:false, fmt:'pct'    },
-        revenuePerEmployee:   { excellent:500000, good:350000, ok:250000, poor:175000, lowerBetter:false, fmt:'dollar' },
+        magicNumber:        { excellent:1.5, good:1.0, ok:0.7, poor:0.4, lowerBetter:false, fmt:'x'      },
+        gtmEfficiency:      { excellent:1.2, good:0.8, ok:0.5, poor:0.3, lowerBetter:false, fmt:'x'      },
+        cacPayback:         { excellent:16,  good:22,  ok:30,  poor:45,  lowerBetter:true,  fmt:'mo'     },
+        ltvCac:             { excellent:8,   good:5,   ok:3,   poor:2,   lowerBetter:false, fmt:'x'      },
+        nrr:                { excellent:125, good:115, ok:105, poor:95,  lowerBetter:false, fmt:'pct'    },
+        revenuePerEmployee: { excellent:500000, good:350000, ok:250000, poor:175000, lowerBetter:false, fmt:'dollar' },
+        quotaOte:           { excellent:5,   good:4,   ok:3,   poor:2.5, lowerBetter:false, fmt:'x'      },
+        attainment:         { excellent:80,  good:70,  ok:60,  poor:50,  lowerBetter:false, fmt:'pct'    },
     },
     enterprise: {
         label: '$200M+ ARR',
-        magicNumber:          { excellent:1.5, good:1.0,  ok:0.7,  poor:0.4,  lowerBetter:false, fmt:'x'      },
-        gtmEfficiency:        { excellent:1.2, good:0.8,  ok:0.5,  poor:0.3,  lowerBetter:false, fmt:'x'      },
-        cacPayback:           { excellent:18,  good:24,   ok:36,   poor:48,   lowerBetter:true,  fmt:'mo'     },
-        ltvCac:               { excellent:10,  good:7,    ok:4,    poor:2.5,  lowerBetter:false, fmt:'x'      },
-        nrr:                  { excellent:130, good:120,  ok:110,  poor:100,  lowerBetter:false, fmt:'pct'    },
-        revenuePerEmployee:   { excellent:700000, good:500000, ok:350000, poor:250000, lowerBetter:false, fmt:'dollar' },
+        magicNumber:        { excellent:1.5, good:1.0, ok:0.7, poor:0.4,  lowerBetter:false, fmt:'x'      },
+        gtmEfficiency:      { excellent:1.2, good:0.8, ok:0.5, poor:0.3,  lowerBetter:false, fmt:'x'      },
+        cacPayback:         { excellent:18,  good:24,  ok:36,  poor:48,   lowerBetter:true,  fmt:'mo'     },
+        ltvCac:             { excellent:10,  good:7,   ok:4,   poor:2.5,  lowerBetter:false, fmt:'x'      },
+        nrr:                { excellent:130, good:120, ok:110, poor:100,  lowerBetter:false, fmt:'pct'    },
+        revenuePerEmployee: { excellent:700000, good:500000, ok:350000, poor:250000, lowerBetter:false, fmt:'dollar' },
+        quotaOte:           { excellent:5,   good:4,   ok:3,   poor:2.5,  lowerBetter:false, fmt:'x'      },
+        attainment:         { excellent:80,  good:70,  ok:60,  poor:50,   lowerBetter:false, fmt:'pct'    },
     }
 };
 
@@ -618,19 +588,26 @@ const BENCHMARKS = {
 // STATE
 // ─────────────────────────────────────────────
 let currentStage = 'growth';
-let radarChart = null;
+let radarChart   = null;
 
 // ─────────────────────────────────────────────
 // HELPERS
 // ─────────────────────────────────────────────
-const getVal = id => parseFloat(document.getElementById(id).value) || 0;
+
+// Read input value, applying M/K multiplier if a toggle exists for that id
+function getVal(id) {
+    const raw = parseFloat(document.getElementById(id).value) || 0;
+    const activeBtn = document.querySelector(`#${id}-toggle .unit-btn.active`);
+    const mult = activeBtn ? parseFloat(activeBtn.dataset.mult) : 1;
+    return raw * mult;
+}
 
 function fmt(n, type) {
     if (!isFinite(n) || isNaN(n)) return '—';
-    switch(type) {
+    switch (type) {
         case 'dollar':
-            if (n >= 1e6) return '$' + (n/1e6).toFixed(1) + 'M';
-            if (n >= 1e3) return '$' + Math.round(n/1e3) + 'K';
+            if (n >= 1e6) return '$' + (n / 1e6).toFixed(1) + 'M';
+            if (n >= 1e3) return '$' + Math.round(n / 1e3) + 'K';
             return '$' + Math.round(n);
         case 'pct': return n.toFixed(1) + '%';
         case 'x':   return n.toFixed(1) + 'x';
@@ -683,41 +660,58 @@ function toRadarScore(value, bench) {
 // CALCULATE
 // ─────────────────────────────────────────────
 function calculate() {
-    const arr             = getVal('arr');
-    const newArr          = getVal('newArr');
-    const grossMargin     = getVal('grossMargin') / 100;
-    const nrr             = getVal('nrr');
-    const smSpend         = getVal('smSpend');
-    const newCustomers    = getVal('newCustomers');
-    const acv             = getVal('acv');
-    const totalHeadcount  = getVal('totalHeadcount');
-    const techSpend       = getVal('techSpend');
+    const arr            = getVal('arr');
+    const newArr         = getVal('newArr');
+    const grossMargin    = getVal('grossMargin') / 100;
+    const nrr            = getVal('nrr');
+    const smSpend        = getVal('smSpend');
+    const newCustomers   = getVal('newCustomers');
+    const acv            = getVal('acv');
+    const totalHeadcount = getVal('totalHeadcount');
+    const techSpend      = getVal('techSpend');
+    const aeHeadcount    = getVal('aeHeadcount');
+    const aeOte          = getVal('aeOte');
+    const attainment     = getVal('attainment'); // as a percent (e.g. 78)
 
     const b = BENCHMARKS[currentStage];
 
-    // Core metrics
+    // ── GTM EFFICIENCY ──
     const magicNumber        = smSpend > 0 ? (newArr * grossMargin) / smSpend : 0;
     const gtmEfficiency      = smSpend > 0 ? newArr / smSpend : 0;
     const cac                = newCustomers > 0 ? smSpend / newCustomers : 0;
     const cacPayback         = (acv > 0 && grossMargin > 0) ? (cac / (acv * grossMargin)) * 12 : 0;
-
-    // LTV: using NRR as growth proxy. If NRR > 100%, business grows forever — cap at 7yr horizon
-    const annualChurnProxy   = Math.max(0.01, (200 - nrr) / 100); // rough inverse of NRR
+    const annualChurnProxy   = Math.max(0.01, (200 - nrr) / 100);
     const ltv                = acv * grossMargin * Math.min(7, 1 / annualChurnProxy);
     const ltvCac             = cac > 0 ? ltv / cac : 0;
     const revenuePerEmployee = totalHeadcount > 0 ? arr / totalHeadcount : 0;
 
-    // Scores
+    // ── REP PRODUCTIVITY ──
+    // Avg quota per AE = new ARR generated / quota-carrying headcount
+    const avgQuota  = aeHeadcount > 0 ? newArr / aeHeadcount : 0;
+    // Quota:OTE ratio — target ≥ 4x
+    const quotaOte  = aeOte > 0 ? avgQuota / aeOte : 0;
+    // ECV:OTE — effective return accounting for actual attainment
+    // "ECV" = quota × attainment%; represents what was actually sold vs. what you paid
+    const ecvOte    = aeOte > 0 ? (avgQuota * (attainment / 100)) / aeOte : 0;
+
+    // ── SCORES ──
     const scores = {
+        magicNumber,        gtmEfficiency,    cacPayback,
+        ltvCac,             nrr,              revenuePerEmployee,
+        quotaOte,           attainment,
+    };
+    const colorMap = {
         magicNumber:        getColor(magicNumber,        b.magicNumber),
         gtmEfficiency:      getColor(gtmEfficiency,      b.gtmEfficiency),
         cacPayback:         getColor(cacPayback,          b.cacPayback),
         ltvCac:             getColor(ltvCac,             b.ltvCac),
         nrr:                getColor(nrr,                b.nrr),
         revenuePerEmployee: getColor(revenuePerEmployee, b.revenuePerEmployee),
+        quotaOte:           getColor(quotaOte,           b.quotaOte),
+        attainment:         getColor(attainment,         b.attainment),
     };
 
-    // Radar scores
+    // Radar: 6 core GTM metrics
     const radarScores = [
         toRadarScore(magicNumber,        b.magicNumber),
         toRadarScore(ltvCac,             b.ltvCac),
@@ -727,36 +721,80 @@ function calculate() {
         toRadarScore(gtmEfficiency,      b.gtmEfficiency),
     ];
 
-    renderMetrics({ magicNumber, gtmEfficiency, cacPayback, ltvCac, nrr, revenuePerEmployee }, scores, b);
+    renderGTMMetrics({ magicNumber, gtmEfficiency, cacPayback, ltvCac, nrr, revenuePerEmployee }, colorMap, b);
+    renderRepMetrics({ quotaOte, attainment, ecvOte, avgQuota, aeOte }, colorMap, b);
     renderRadar(radarScores);
-    renderSummary({ magicNumber, cacPayback, ltvCac, nrr, revenuePerEmployee }, scores);
-    renderActions({ magicNumber, cacPayback, ltvCac, nrr, revenuePerEmployee, techSpend, arr, smSpend, newArr }, scores, b);
+    renderSummary({ magicNumber, cacPayback, ltvCac, nrr, revenuePerEmployee, quotaOte, attainment }, colorMap);
+    renderActions({ magicNumber, cacPayback, ltvCac, nrr, revenuePerEmployee, techSpend, arr, smSpend, newArr, quotaOte, attainment, ecvOte }, colorMap, b);
 }
 
 // ─────────────────────────────────────────────
-// RENDER: METRICS
+// RENDER: GTM METRICS
 // ─────────────────────────────────────────────
-function renderMetrics(metrics, scores, b) {
+function renderGTMMetrics(metrics, colorMap, b) {
     const defs = [
-        { key:'magicNumber',        label:'Magic Number',        hint:'(New ARR × GM) ÷ S&M Spend',          bench: `Best-in-class: ≥${b.magicNumber.excellent}x` },
-        { key:'gtmEfficiency',      label:'GTM Efficiency',      hint:'New ARR ÷ S&M Spend',                  bench: `Target: ≥${b.gtmEfficiency.good}x` },
-        { key:'cacPayback',         label:'CAC Payback',         hint:'Months to recover CAC',                bench: `Best: <${b.cacPayback.excellent} months` },
-        { key:'ltvCac',             label:'LTV : CAC',           hint:'Customer lifetime value vs. cost',     bench: `Target: ≥${b.ltvCac.good}x` },
-        { key:'nrr',                label:'Net Revenue Retention', hint:'Expansion minus churn',              bench: `Best-in-class: ≥${b.nrr.excellent}%` },
-        { key:'revenuePerEmployee', label:'Revenue / Employee',  hint:'ARR per full-time employee',           bench: `Target: ≥${fmt(b.revenuePerEmployee.good, 'dollar')}` },
+        { key:'magicNumber',        label:'Magic Number',          hint:'(New ARR × GM) ÷ S&M Spend', bench:`Best-in-class: ≥${b.magicNumber.excellent}x` },
+        { key:'gtmEfficiency',      label:'GTM Efficiency',        hint:'New ARR ÷ S&M Spend',         bench:`Target: ≥${b.gtmEfficiency.good}x` },
+        { key:'cacPayback',         label:'CAC Payback',           hint:'Months to recover CAC',       bench:`Best: <${b.cacPayback.excellent} months` },
+        { key:'ltvCac',             label:'LTV : CAC',             hint:'Lifetime value vs. cost',     bench:`Target: ≥${b.ltvCac.good}x` },
+        { key:'nrr',                label:'Net Revenue Retention', hint:'Expansion minus churn',       bench:`Best-in-class: ≥${b.nrr.excellent}%` },
+        { key:'revenuePerEmployee', label:'Revenue / Employee',    hint:'ARR per FTE',                 bench:`Target: ≥${fmt(b.revenuePerEmployee.good,'dollar')}` },
     ];
 
     document.getElementById('metricsGrid').innerHTML = defs.map(d => {
-        const color = scores[d.key];
+        const color = colorMap[d.key];
         const value = fmt(metrics[d.key], b[d.key].fmt);
-        return `
-            <div class="metric-card ${color}" title="${d.hint}">
-                <div class="metric-name">${d.label}</div>
-                <div class="metric-value">${value}</div>
-                <div class="metric-status">${getStatusLabel(color)}</div>
-                <div class="metric-benchmark">${d.bench}</div>
-            </div>`;
+        return `<div class="metric-card ${color}" title="${d.hint}">
+            <div class="metric-name">${d.label}</div>
+            <div class="metric-value">${value}</div>
+            <div class="metric-status">${getStatusLabel(color)}</div>
+            <div class="metric-benchmark">${d.bench}</div>
+        </div>`;
     }).join('');
+}
+
+// ─────────────────────────────────────────────
+// RENDER: REP PRODUCTIVITY METRICS
+// ─────────────────────────────────────────────
+function renderRepMetrics(metrics, colorMap, b) {
+    // ECV:OTE color: green if ≥ 4x, yellow if ≥ 3x, red otherwise
+    const ecvColor = metrics.ecvOte >= 4 ? 'green' : metrics.ecvOte >= 3 ? 'yellow' : 'red';
+    const ecvStatus = metrics.ecvOte >= 4 ? '▲ Strong return' : metrics.ecvOte >= 3 ? '◆ Adequate' : '▼ Below 4x target';
+
+    const cards = [
+        {
+            color: colorMap.quotaOte,
+            name: 'Quota : OTE',
+            value: fmt(metrics.quotaOte, 'x'),
+            status: getStatusLabel(colorMap.quotaOte),
+            bench: `Target: ≥${b.quotaOte.good}x · Best-in-class: ≥${b.quotaOte.excellent}x`,
+            hint: 'Avg quota per AE ÷ avg AE OTE'
+        },
+        {
+            color: colorMap.attainment,
+            name: 'Avg Attainment',
+            value: fmt(metrics.attainment, 'pct'),
+            status: getStatusLabel(colorMap.attainment),
+            bench: `Target: ≥${b.attainment.good}% · Best-in-class: ≥${b.attainment.excellent}%`,
+            hint: 'Average attainment across quota-carrying AEs'
+        },
+        {
+            color: ecvColor,
+            name: 'ECV : OTE',
+            value: fmt(metrics.ecvOte, 'x'),
+            status: ecvStatus,
+            bench: 'Target: ≥4x · Quota × Attainment ÷ OTE',
+            hint: 'Effective return: actual production vs. what you paid'
+        },
+    ];
+
+    document.getElementById('repGrid').innerHTML = cards.map(c => `
+        <div class="metric-card ${c.color}" title="${c.hint}">
+            <div class="metric-name">${c.name}</div>
+            <div class="metric-value">${c.value}</div>
+            <div class="metric-status">${c.status}</div>
+            <div class="metric-benchmark">${c.bench}</div>
+        </div>`).join('');
 }
 
 // ─────────────────────────────────────────────
@@ -793,8 +831,7 @@ function renderRadar(scores) {
             maintainAspectRatio: false,
             scales: {
                 r: {
-                    min: 0,
-                    max: 100,
+                    min: 0, max: 100,
                     ticks: { display: false, stepSize: 25 },
                     grid: { color: 'rgba(28,40,64,0.8)' },
                     angleLines: { color: 'rgba(28,40,64,0.8)' },
@@ -819,87 +856,89 @@ function renderRadar(scores) {
 // ─────────────────────────────────────────────
 // RENDER: SUMMARY
 // ─────────────────────────────────────────────
-function renderSummary(metrics, scores) {
-    const greenCount = Object.values(scores).filter(s => s === 'green').length;
-    const redCount   = Object.values(scores).filter(s => s === 'red').length;
+function renderSummary(metrics, colorMap) {
+    const allColors  = Object.values(colorMap);
+    const greenCount = allColors.filter(s => s === 'green').length;
+    const redCount   = allColors.filter(s => s === 'red').length;
 
     let healthClass, healthLabel, opener;
-    if (greenCount >= 5) {
-        healthClass = 'green'; healthLabel = 'Strong';
-        opener = 'GTM engine is operating at or above best-in-class benchmarks.';
-    } else if (redCount >= 3) {
-        healthClass = 'red'; healthLabel = 'At Risk';
-        opener = 'GTM efficiency requires structural attention before scaling investment.';
-    } else if (greenCount >= 3 && redCount <= 1) {
-        healthClass = 'green'; healthLabel = 'Solid';
-        opener = 'GTM efficiency is solid with selective improvement opportunities.';
-    } else {
-        healthClass = 'yellow'; healthLabel = 'Mixed';
-        opener = 'GTM engine shows mixed efficiency — some metrics are strong, others need attention.';
-    }
+    if (greenCount >= 6)                       { healthClass='green';  healthLabel='Strong'; opener='GTM engine is operating at or above best-in-class benchmarks.'; }
+    else if (redCount >= 3)                    { healthClass='red';    healthLabel='At Risk'; opener='GTM efficiency requires structural attention before scaling investment.'; }
+    else if (greenCount >= 4 && redCount <= 1) { healthClass='green';  healthLabel='Solid';  opener='GTM efficiency is solid with selective improvement opportunities.'; }
+    else                                       { healthClass='yellow'; healthLabel='Mixed';  opener='GTM engine shows mixed efficiency — some metrics are strong, others need attention.'; }
 
     const nrrNote = metrics.nrr >= 110
         ? `NRR of ${fmt(metrics.nrr,'pct')} confirms strong expansion motion and reduces reliance on new logo acquisition.`
         : metrics.nrr < 100
-        ? `NRR of ${fmt(metrics.nrr,'pct')} signals a retention problem that will compound at scale — this is the highest-priority fix.`
+        ? `NRR of ${fmt(metrics.nrr,'pct')} signals a retention problem that will compound at scale — highest-priority fix.`
         : `NRR of ${fmt(metrics.nrr,'pct')} is adequate; pushing above 110% would meaningfully improve capital efficiency.`;
 
-    const effNote = scores.magicNumber === 'green'
-        ? `Magic Number of ${fmt(metrics.magicNumber,'x')} supports increased S&M investment — the unit economics justify the bet.`
-        : scores.magicNumber === 'red'
-        ? `Magic Number of ${fmt(metrics.magicNumber,'x')} indicates S&M spend should be held until root cause is identified.`
-        : `Magic Number of ${fmt(metrics.magicNumber,'x')} is workable — optimize conversion and ACV before materially increasing spend.`;
+    const compNote = metrics.quotaOte >= 4
+        ? `Quota:OTE of ${fmt(metrics.quotaOte,'x')} with ${fmt(metrics.attainment,'pct')} avg attainment delivers a strong ${fmt(metrics.quotaOte * metrics.attainment / 100,'x')} effective return on comp investment.`
+        : `Quota:OTE of ${fmt(metrics.quotaOte,'x')} is below the 4x threshold — comp plan structure or quota-setting needs review.`;
 
     document.getElementById('healthBadge').className = `health-badge ${healthClass}`;
     document.getElementById('healthBadge').textContent = healthLabel;
     document.getElementById('overallHealthBadge').className = `badge badge-${healthClass === 'green' ? 'green' : 'blue'}`;
     document.getElementById('overallHealthBadge').textContent = healthLabel;
-    document.getElementById('summaryText').textContent = `${opener} ${nrrNote} ${effNote}`;
+    document.getElementById('summaryText').textContent = `${opener} ${nrrNote} ${compNote}`;
 }
 
 // ─────────────────────────────────────────────
-// RENDER: ACTION ITEMS
+// RENDER: ACTIONS
 // ─────────────────────────────────────────────
-function renderActions(m, scores, b) {
+function renderActions(m, colorMap, b) {
     const actions = [];
 
     if (m.nrr < 100) {
         actions.push({ color:'red', text:`NRR below 100% means you're losing revenue from existing customers. Fix retention before optimizing acquisition — otherwise CAC investment compounds on a leaking base.` });
     }
 
-    if (scores.magicNumber === 'red') {
+    if (colorMap.magicNumber === 'red') {
         actions.push({ color:'red', text:`Magic Number of ${fmt(m.magicNumber,'x')} is below threshold. Hold S&M investment until root-caused: likely a conversion rate, ACV, segment mix, or churn problem.` });
     }
 
-    if (scores.cacPayback === 'red') {
-        actions.push({ color:'red', text:`CAC payback of ${fmt(m.cacPayback,'mo')} exceeds acceptable range for ${BENCHMARKS[currentStage].label}. Audit lead quality, ICP fit, and rep productivity before next spend cycle.` });
+    if (colorMap.cacPayback === 'red') {
+        actions.push({ color:'red', text:`CAC payback of ${fmt(m.cacPayback,'mo')} exceeds acceptable range. Audit lead quality, ICP fit, and rep productivity before next spend cycle.` });
     }
 
-    if (scores.ltvCac === 'yellow' || scores.ltvCac === 'red') {
+    if (m.quotaOte < 4) {
+        actions.push({ color:'red', text:`Quota:OTE of ${fmt(m.quotaOte,'x')} is below the 4x floor. At this ratio, comp cost erodes GTM efficiency. Raise quotas, reduce OTE, or fix the segment mix driving low average deal size.` });
+    } else if (m.quotaOte >= 5) {
+        actions.push({ color:'green', text:`Quota:OTE of ${fmt(m.quotaOte,'x')} is strong. Verify this is sustainable at the current attainment rate — over-indexed quotas at low attainment create retention risk.` });
+    }
+
+    if (m.attainment < 60) {
+        actions.push({ color:'red', text:`Avg attainment of ${fmt(m.attainment,'pct')} is a structural problem. Below 60% typically signals quota-setting methodology, territory design, or ramp curve issues — not individual rep underperformance.` });
+    } else if (m.attainment < 70) {
+        actions.push({ color:'yellow', text:`Avg attainment of ${fmt(m.attainment,'pct')} is below target. Run a cohort analysis: are top performers carrying the number or is underperformance broadly distributed? The answer dictates the fix.` });
+    }
+
+    if (m.ecvOte > 0 && m.ecvOte < 4) {
+        actions.push({ color:'yellow', text:`ECV:OTE of ${fmt(m.ecvOte,'x')} — the actual return on comp investment after attainment — is below the 4x target. Closing the gap requires either higher attainment or a better Quota:OTE ratio.` });
+    }
+
+    if (colorMap.ltvCac === 'yellow' || colorMap.ltvCac === 'red') {
         actions.push({ color:'yellow', text:`LTV:CAC of ${fmt(m.ltvCac,'x')} is below target. Primary levers: raise ACV through packaging or upsell, improve gross margin, or tighten ICP to reduce CAC.` });
     }
 
-    if (scores.revenuePerEmployee === 'yellow' || scores.revenuePerEmployee === 'red') {
-        actions.push({ color:'yellow', text:`Revenue per employee of ${fmt(m.revenuePerEmployee,'dollar')} suggests headcount is outpacing ARR growth. AI-augmented workflows and process automation should precede next hiring cycle.` });
-    }
-
     if (m.techSpend > 0 && m.arr > 0 && (m.techSpend / m.arr) > 0.08) {
-        actions.push({ color:'yellow', text:`Tech spend ratio of ${fmt((m.techSpend/m.arr)*100,'pct')} of ARR is elevated. Audit stack for redundancy and AI-replacement opportunities before next renewal cycle.` });
+        actions.push({ color:'yellow', text:`Tech spend at ${fmt((m.techSpend/m.arr)*100,'pct')} of ARR is elevated. Audit stack for redundancy and AI-replacement opportunities before next renewal cycle.` });
     }
 
-    if (scores.magicNumber === 'green' && scores.cacPayback !== 'red') {
-        actions.push({ color:'green', text:`Magic Number of ${fmt(m.magicNumber,'x')} supports increased S&M investment. Model a 20–30% spend increase and current efficiency ratios justify the bet at ${BENCHMARKS[currentStage].label}.` });
+    if (colorMap.magicNumber === 'green' && colorMap.cacPayback !== 'red') {
+        actions.push({ color:'green', text:`Magic Number of ${fmt(m.magicNumber,'x')} supports increased S&M investment. Model a 20–30% spend increase — current efficiency ratios justify the bet at ${BENCHMARKS[currentStage].label}.` });
     }
 
     if (m.nrr >= 115) {
-        actions.push({ color:'green', text:`Strong NRR of ${fmt(m.nrr,'pct')} creates a compounding growth base. Model NRR's contribution to ARR plan — this reduces new logo dependence and improves payback math.` });
+        actions.push({ color:'green', text:`NRR of ${fmt(m.nrr,'pct')} creates a compounding growth base. Model NRR's contribution to your ARR plan — this reduces new logo dependence and materially improves payback math.` });
     }
 
     if (actions.length === 0) {
         actions.push({ color:'green', text:'All key metrics within acceptable ranges. Maintain efficiency discipline as you scale — the next inflection point typically comes at 2–3x current ARR.' });
     }
 
-    document.getElementById('actionItems').innerHTML = actions.slice(0,5).map(a => `
+    document.getElementById('actionItems').innerHTML = actions.slice(0, 5).map(a => `
         <div class="action-item">
             <div class="action-dot ${a.color}"></div>
             <div class="action-text">${a.text}</div>
@@ -909,6 +948,8 @@ function renderActions(m, scores, b) {
 // ─────────────────────────────────────────────
 // EVENT LISTENERS
 // ─────────────────────────────────────────────
+
+// Stage buttons
 document.querySelectorAll('.stage-btn').forEach(btn => {
     btn.addEventListener('click', () => {
         document.querySelectorAll('.stage-btn').forEach(b => b.classList.remove('active'));
@@ -918,8 +959,20 @@ document.querySelectorAll('.stage-btn').forEach(btn => {
     });
 });
 
+// Number inputs
 document.querySelectorAll('input[type="number"]').forEach(input => {
     input.addEventListener('input', calculate);
+});
+
+// Unit toggle buttons
+document.querySelectorAll('.unit-toggle').forEach(toggle => {
+    toggle.addEventListener('click', e => {
+        const btn = e.target.closest('.unit-btn');
+        if (!btn) return;
+        toggle.querySelectorAll('.unit-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        calculate();
+    });
 });
 
 // Init
