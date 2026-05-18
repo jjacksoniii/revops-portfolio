@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI-Native GTM Operating Model Canvas | James Jackson</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --bg:     #07090f;
+            --card:   #0d1120;
+            --border: #1c2840;
+            --border-md: #243354;
+            --text:   #e8edf5;
+            --text-2: #8b9bbf;
+            --text-3: #4a5a7a;
+            --c1: #4f8ef7; --c1d: #172240;
+            --c2: #8b5cf6; --c2d: #1e133a;
+            --c3: #10b981; --c3d: #052e20;
+            --c4: #f59e0b; --c4d: #3d2600;
+            --c5: #fb923c; --c5d: #3a1a00;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+        }
+
+        /* ── HEADER ── */
+        .header {
+            background: linear-gradient(180deg, #0a0f1e 0%, var(--bg) 100%);
+            border-bottom: 1px solid var(--border);
+            padding: 22px 36px 18px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+        }
+
+        .header h1 {
+            font-size: 20px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+        }
+
+        .header p {
+            font-size: 13px;
+            color: var(--text-2);
+            margin-top: 4px;
+        }
+
+        .header-meta {
+            text-align: right;
+        }
+
+        .byline {
+            font-size: 12px;
+            color: var(--text-3);
+            margin-bottom: 4px;
+        }
+
+        .byline strong {
+            color: var(--text-2);
+        }
+
+        .badge-row {
+            display: flex;
+            gap: 6px;
+            justify-content: flex-end;
+        }
+
+        .badge {
+            font-size: 10px;
+            font-weight: 700;
+            padding: 3px 9px;
+            border-radius: 12px;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        .b-blue { background: var(--c1d); color: var(--c1); border: 1px solid #1e3a6e; }
+        .b-green { background: var(--c3d); color: var(--c3); border: 1px solid #0a4a30; }
+
+        /* ── CANVAS ── */
+        .canvas {
+            padding: 20px 24px;
+        }
+
+        /* ── TOP FOUR BLOCKS ── */
+        .top-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .canvas-block {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            overflow: hidden;
+            transition: border-color 0.2s, transform 0.15s;
+        }
+
+        .canvas-block:hover {
+            border-color: var(--border-md);
+            transform: translateY(-2px);
+        }
+
+        .block-header {
+            padding: 12px 16px 10px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .block-num {
+            font-size: 9px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            opacity: 0.6;
+            margin-bottom: 3px;
+        }
+
+        .block-title {
+            font-size: 13px;
+            font-weight: 700;
+            letter-spacing: -0.2px;
+        }
+
+        .block-sub {
+            font-size: 10px;
+            margin-top: 2px;
+            opacity: 0.7;
+        }
+
+        /* Block color themes */
+        .b1 .block-header { background: linear-gradient(135deg, #0f1c38, #111f3a); border-color: #1e3a6e; }
+        .b1 .block-num    { color: var(--c1); }
+        .b1 .block-title  { color: var(--c1); }
+        .b1 .block-sub    { color: var(--c1); }
+        .b1 .ai-unlock    { border-color: #1e3a6e; background: #0d1628; }
+        .b1 .ai-unlock-label { color: var(--c1); }
+
+        .b2 .block-header { background: linear-gradient(135deg, #14102a, #16122e); border-color: #2d1a5a; }
+        .b2 .block-num    { color: var(--c2); }
+        .b2 .block-title  { color: var(--c2); }
+        .b2 .block-sub    { color: var(--c2); }
+        .b2 .ai-unlock    { border-color: #2d1a5a; background: #10091e; }
+        .b2 .ai-unlock-label { color: var(--c2); }
+
+        .b3 .block-header { background: linear-gradient(135deg, #082318, #09261a); border-color: #0a4a30; }
+        .b3 .block-num    { color: var(--c3); }
+        .b3 .block-title  { color: var(--c3); }
+        .b3 .block-sub    { color: var(--c3); }
+        .b3 .ai-unlock    { border-color: #0a4a30; background: #051810; }
+        .b3 .ai-unlock-label { color: var(--c3); }
+
+        .b4 .block-header { background: linear-gradient(135deg, #2a1a00, #2d1d00); border-color: #5a3a00; }
+        .b4 .block-num    { color: var(--c4); }
+        .b4 .block-title  { color: var(--c4); }
+        .b4 .block-sub    { color: var(--c4); }
+        .b4 .ai-unlock    { border-color: #5a3a00; background: #1e1200; }
+        .b4 .ai-unlock-label { color: var(--c4); }
+
+        .block-body {
+            padding: 14px 16px;
+        }
+
+        .block-items {
+            list-style: none;
+            margin-bottom: 12px;
+        }
+
+        .block-items li {
+            font-size: 12px;
+            color: var(--text-2);
+            padding: 4px 0;
+            border-bottom: 1px solid rgba(28,40,64,0.6);
+            display: flex;
+            gap: 7px;
+            align-items: flex-start;
+            line-height: 1.45;
+        }
+
+        .block-items li:last-child { border-bottom: none; }
+
+        .item-dot {
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            margin-top: 5px;
+            flex-shrink: 0;
+        }
+
+        .b1 .item-dot { background: var(--c1); }
+        .b2 .item-dot { background: var(--c2); }
+        .b3 .item-dot { background: var(--c3); }
+        .b4 .item-dot { background: var(--c4); }
+
+        /* AI Unlock badge */
+        .ai-unlock {
+            border-radius: 6px;
+            border: 1px solid;
+            padding: 8px 10px;
+            margin-top: 10px;
+        }
+
+        .ai-unlock-label {
+            font-size: 9px;
+            font-weight: 700;
+            letter-spacing: 0.8px;
+            text-transform: uppercase;
+            margin-bottom: 4px;
+        }
+
+        .ai-unlock-text {
+            font-size: 11px;
+            color: var(--text-2);
+            line-height: 1.5;
+        }
+
+        /* ── CONNECTIVE LAYER: DATA & INTELLIGENCE ── */
+        .data-layer {
+            background: linear-gradient(135deg, #0a0f20, #0c1228);
+            border: 1px solid #1e3068;
+            border-radius: 10px;
+            padding: 16px 20px;
+            margin-bottom: 10px;
+            display: grid;
+            grid-template-columns: auto 1fr 1fr 1fr 1fr;
+            gap: 16px;
+            align-items: center;
+        }
+
+        .data-label-block {
+            border-right: 1px solid #1e3068;
+            padding-right: 16px;
+        }
+
+        .data-layer-tag {
+            font-size: 9px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: var(--c1);
+            margin-bottom: 4px;
+        }
+
+        .data-layer-title {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--c1);
+            white-space: nowrap;
+        }
+
+        .data-layer-sub {
+            font-size: 10px;
+            color: var(--text-3);
+            margin-top: 2px;
+            white-space: nowrap;
+        }
+
+        .data-pillar {
+            padding: 0 4px;
+        }
+
+        .pillar-name {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .pillar-dot {
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            background: var(--c1);
+            flex-shrink: 0;
+        }
+
+        .pillar-items {
+            list-style: none;
+        }
+
+        .pillar-items li {
+            font-size: 11px;
+            color: var(--text-2);
+            padding: 2px 0;
+        }
+
+        /* ── BOTTOM STRIP: METRICS + FORMULA ── */
+        .bottom-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 10px;
+        }
+
+        .bottom-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 16px 18px;
+        }
+
+        .bottom-card-title {
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: var(--text-3);
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        /* Metrics table */
+        .metrics-table {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+
+        .metric-item {
+            padding: 8px 10px;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+        }
+
+        .metric-item-name {
+            font-size: 10px;
+            color: var(--text-3);
+            margin-bottom: 3px;
+        }
+
+        .metric-item-val {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--text);
+        }
+
+        /* Automation tiers */
+        .tier-row {
+            display: flex;
+            gap: 8px;
+            align-items: flex-start;
+            padding: 7px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .tier-row:last-child { border-bottom: none; }
+
+        .tier-badge {
+            font-size: 9px;
+            font-weight: 700;
+            padding: 2px 7px;
+            border-radius: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            flex-shrink: 0;
+        }
+
+        .tb-auto { background: var(--c3d); color: var(--c3); border: 1px solid #0a4a30; }
+        .tb-aug  { background: var(--c1d); color: var(--c1); border: 1px solid #1e3a6e; }
+        .tb-hum  { background: var(--c2d); color: var(--c2); border: 1px solid #2d1a5a; }
+
+        .tier-text {
+            font-size: 11px;
+            color: var(--text-2);
+            line-height: 1.5;
+        }
+
+        /* Principle blocks */
+        .principle {
+            display: flex;
+            gap: 10px;
+            padding: 7px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .principle:last-child { border-bottom: none; }
+
+        .pr-num {
+            font-size: 10px;
+            font-weight: 800;
+            color: var(--c5);
+            width: 14px;
+            flex-shrink: 0;
+            margin-top: 1px;
+        }
+
+        .pr-text {
+            font-size: 11px;
+            color: var(--text-2);
+            line-height: 1.55;
+        }
+
+        /* ── FOOTER ── */
+        .footer {
+            text-align: center;
+            padding: 14px;
+            font-size: 12px;
+            color: var(--text-3);
+            border-top: 1px solid var(--border);
+            margin-top: 4px;
+        }
+
+        .footer a { color: var(--c1); text-decoration: none; }
+    </style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+    <div>
+        <h1>AI-Native GTM Operating Model Canvas</h1>
+        <p>Five integrated dimensions of a high-leverage revenue operations function</p>
+    </div>
+    <div class="header-meta">
+        <div class="byline"><strong>James Jackson</strong> &nbsp;·&nbsp; VP Revenue Operations</div>
+        <div class="badge-row">
+            <span class="badge b-blue">COO Framework</span>
+            <span class="badge b-green">AI-Native</span>
+        </div>
+    </div>
+</div>
+
+<div class="canvas">
+
+    <!-- TOP FOUR BLOCKS -->
+    <div class="top-grid">
+
+        <!-- 1. Revenue Strategy -->
+        <div class="canvas-block b1">
+            <div class="block-header">
+                <div class="block-num">01 &nbsp;·&nbsp; Foundation</div>
+                <div class="block-title">Revenue Strategy</div>
+                <div class="block-sub">ICP · Segmentation · Motion · Pricing</div>
+            </div>
+            <div class="block-body">
+                <ul class="block-items">
+                    <li><div class="item-dot"></div>ICP defined by firmographic + behavioral + technographic signals</li>
+                    <li><div class="item-dot"></div>Segment tiering: Enterprise / Mid-Market / SMB with distinct motions</li>
+                    <li><div class="item-dot"></div>Growth motion selected per segment: sales-led, PLG, or hybrid</li>
+                    <li><div class="item-dot"></div>Pricing architecture aligned to value metric, not cost-plus</li>
+                    <li><div class="item-dot"></div>TAM/SAM/SOM refreshed quarterly from market intelligence</li>
+                </ul>
+                <div class="ai-unlock">
+                    <div class="ai-unlock-label">⚡ AI-Native Unlock</div>
+                    <div class="ai-unlock-text">Propensity-to-buy models replace static ICP rules — AI continuously refines ideal customer profile from win/loss signals.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. Organizational Design -->
+        <div class="canvas-block b2">
+            <div class="block-header">
+                <div class="block-num">02 &nbsp;·&nbsp; Structure</div>
+                <div class="block-title">Organizational Design</div>
+                <div class="block-sub">Team · Governance · RACI · Influence</div>
+            </div>
+            <div class="block-body">
+                <ul class="block-items">
+                    <li><div class="item-dot"></div>RevOps as strategic function: Ops, Analytics, Enablement, Data Engineering</li>
+                    <li><div class="item-dot"></div>Span: 1 RevOps per 15–20 quota-carrying reps at growth stage</li>
+                    <li><div class="item-dot"></div>Clear RACI across Sales, CS, Marketing, and Finance</li>
+                    <li><div class="item-dot"></div>RevOps in the room for headcount planning, not just systems requests</li>
+                    <li><div class="item-dot"></div>Hiring profile: SQL + Salesforce admin + AI fluency</li>
+                </ul>
+                <div class="ai-unlock">
+                    <div class="ai-unlock-label">⚡ AI-Native Unlock</div>
+                    <div class="ai-unlock-text">AI augments every RevOps role, not just admin tasks — one AI-fluent analyst outperforms three traditional ops analysts.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. GTM Process -->
+        <div class="canvas-block b3">
+            <div class="block-header">
+                <div class="block-num">03 &nbsp;·&nbsp; Execution</div>
+                <div class="block-title">GTM Process</div>
+                <div class="block-sub">Workflow · Cadence · Playbooks · Handoffs</div>
+            </div>
+            <div class="block-body">
+                <ul class="block-items">
+                    <li><div class="item-dot"></div>Stage definitions with measurable exit criteria enforced in CRM</li>
+                    <li><div class="item-dot"></div>Handoff protocols: SDR→AE, AE→CS, CS→Renewal — zero context loss</li>
+                    <li><div class="item-dot"></div>Review cadence: daily standup, weekly pipeline, monthly QBR, quarterly planning</li>
+                    <li><div class="item-dot"></div>Playbook library segmented by vertical, deal size, and competitive scenario</li>
+                    <li><div class="item-dot"></div>Win/loss analysis embedded in process, not treated as a separate initiative</li>
+                </ul>
+                <div class="ai-unlock">
+                    <div class="ai-unlock-label">⚡ AI-Native Unlock</div>
+                    <div class="ai-unlock-text">Dynamic playbooks adapt to deal characteristics in real time — AI surfaces next-best-action based on comparable historical wins.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 4. Tech Architecture -->
+        <div class="canvas-block b4">
+            <div class="block-header">
+                <div class="block-num">04 &nbsp;·&nbsp; Infrastructure</div>
+                <div class="block-title">Tech Architecture</div>
+                <div class="block-sub">Stack · Integrations · Automation · AI</div>
+            </div>
+            <div class="block-body">
+                <ul class="block-items">
+                    <li><div class="item-dot"></div>CRM as system of record: Salesforce configured to the business model, not the other way around</li>
+                    <li><div class="item-dot"></div>Data warehouse (Snowflake) as single source of truth across GTM + Finance + Product</li>
+                    <li><div class="item-dot"></div>Stack evaluated quarterly: Build vs. Buy vs. AI-Replace framework applied to every renewal</li>
+                    <li><div class="item-dot"></div>Reliable bidirectional integrations — data latency is a P&L issue, not an IT issue</li>
+                    <li><div class="item-dot"></div>Tech spend target: ≤6% of ARR at scale; ≤12% at early stage</li>
+                </ul>
+                <div class="ai-unlock">
+                    <div class="ai-unlock-label">⚡ AI-Native Unlock</div>
+                    <div class="ai-unlock-text">Custom AI workflows (Claude API + Zapier) automate analyst-level work — reducing RevOps backlog without proportional headcount growth.</div>
+                </div>
+            </div>
+        </div>
+
+    </div><!-- /top-grid -->
+
+    <!-- DATA & INTELLIGENCE LAYER -->
+    <div class="data-layer">
+        <div class="data-label-block">
+            <div class="data-layer-tag">05 · Connective Layer</div>
+            <div class="data-layer-title">Data &</div>
+            <div class="data-layer-title">Intelligence</div>
+            <div class="data-layer-sub">The operating system</div>
+            <div class="data-layer-sub">beneath all four blocks</div>
+        </div>
+
+        <div class="data-pillar">
+            <div class="pillar-name"><div class="pillar-dot" style="background:#4f8ef7;"></div>Pipeline Health</div>
+            <ul class="pillar-items">
+                <li>Coverage ratio by segment</li>
+                <li>Stage conversion vs. benchmark</li>
+                <li>Velocity (days per stage)</li>
+                <li>Slippage rate by reason</li>
+                <li>At-risk deal signals</li>
+            </ul>
+        </div>
+
+        <div class="data-pillar">
+            <div class="pillar-name"><div class="pillar-dot" style="background:#10b981;"></div>Customer Intelligence</div>
+            <ul class="pillar-items">
+                <li>NRR by cohort and segment</li>
+                <li>Health score (product + engagement)</li>
+                <li>Churn prediction model</li>
+                <li>Expansion propensity scoring</li>
+                <li>EBR attendance and sentiment</li>
+            </ul>
+        </div>
+
+        <div class="data-pillar">
+            <div class="pillar-name"><div class="pillar-dot" style="background:#8b5cf6;"></div>Revenue Forecasting</div>
+            <ul class="pillar-items">
+                <li>Multi-method: rep + AI + coverage</li>
+                <li>Scenario modeling (base/upside/risk)</li>
+                <li>Commit vs. best case tracking</li>
+                <li>Monthly/quarterly waterfall</li>
+                <li>Historical accuracy by rep/manager</li>
+            </ul>
+        </div>
+
+        <div class="data-pillar">
+            <div class="pillar-name"><div class="pillar-dot" style="background:#f59e0b;"></div>GTM Efficiency</div>
+            <ul class="pillar-items">
+                <li>Magic Number by quarter</li>
+                <li>CAC payback by segment/channel</li>
+                <li>Revenue per employee trend</li>
+                <li>LTV:CAC by cohort</li>
+                <li>Tech spend as % of ARR</li>
+            </ul>
+        </div>
+    </div><!-- /data-layer -->
+
+    <!-- BOTTOM STRIP -->
+    <div class="bottom-grid">
+
+        <!-- Board-Level KPIs -->
+        <div class="bottom-card">
+            <div class="bottom-card-title">Board-Level KPI Targets</div>
+            <div class="metrics-table">
+                <div class="metric-item">
+                    <div class="metric-item-name">Magic Number</div>
+                    <div class="metric-item-val" style="color:#4f8ef7;">&gt; 0.8x</div>
+                </div>
+                <div class="metric-item">
+                    <div class="metric-item-name">CAC Payback</div>
+                    <div class="metric-item-val" style="color:#10b981;">&lt; 20 mo</div>
+                </div>
+                <div class="metric-item">
+                    <div class="metric-item-name">Net Revenue Retention</div>
+                    <div class="metric-item-val" style="color:#10b981;">&gt; 115%</div>
+                </div>
+                <div class="metric-item">
+                    <div class="metric-item-name">LTV : CAC</div>
+                    <div class="metric-item-val" style="color:#4f8ef7;">&gt; 5x</div>
+                </div>
+                <div class="metric-item">
+                    <div class="metric-item-name">Rev / Employee</div>
+                    <div class="metric-item-val" style="color:#8b5cf6;">&gt; $300K</div>
+                </div>
+                <div class="metric-item">
+                    <div class="metric-item-name">Forecast Accuracy</div>
+                    <div class="metric-item-val" style="color:#f59e0b;">&lt; 8% var</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- AI Automation Tiers -->
+        <div class="bottom-card">
+            <div class="bottom-card-title">AI Automation Tiers</div>
+            <div class="tier-row">
+                <span class="tier-badge tb-auto">Autonomous</span>
+                <span class="tier-text">Data enrichment, record hygiene, lead routing, renewal alerts, pipeline hygiene flags</span>
+            </div>
+            <div class="tier-row">
+                <span class="tier-badge tb-aug">Augmented</span>
+                <span class="tier-text">Forecasting, deal risk scoring, rep coaching, territory optimization, comp modeling</span>
+            </div>
+            <div class="tier-row">
+                <span class="tier-badge tb-hum">Human-Led</span>
+                <span class="tier-text">ICP definition, strategic pricing, comp plan design, organizational structure, M&A decisions</span>
+            </div>
+        </div>
+
+        <!-- Design Principles -->
+        <div class="bottom-card">
+            <div class="bottom-card-title">Operating Principles</div>
+            <div class="principle">
+                <span class="pr-num">1</span>
+                <span class="pr-text"><strong style="color:var(--text);">Data before tools.</strong> Every new tool decision assumes reliable, clean data in the CRM. AI on dirty data is negative leverage.</span>
+            </div>
+            <div class="principle">
+                <span class="pr-num">2</span>
+                <span class="pr-text"><strong style="color:var(--text);">Build vs. buy vs. AI-replace.</strong> Before every renewal, ask: can an AI workflow eliminate this tool entirely?</span>
+            </div>
+            <div class="principle">
+                <span class="pr-num">3</span>
+                <span class="pr-text"><strong style="color:var(--text);">RevOps owns the efficiency narrative.</strong> Magic Number and CAC payback are not finance metrics — they're RevOps outputs.</span>
+            </div>
+            <div class="principle">
+                <span class="pr-num">4</span>
+                <span class="pr-text"><strong style="color:var(--text);">Process before scale.</strong> Adding headcount to a broken process creates a more expensive broken process.</span>
+            </div>
+        </div>
+
+    </div><!-- /bottom-grid -->
+
+</div><!-- /canvas -->
+
+<!-- FOOTER -->
+<div class="footer">
+    James Jackson &nbsp;·&nbsp; RevOps Portfolio &nbsp;·&nbsp;
+    <a href="https://www.linkedin.com/in/jamesrjacksoniii" target="_blank">linkedin.com/in/jamesrjacksoniii</a>
+    &nbsp;·&nbsp; Framework informed by VP RevOps experience at Canva, Snowflake, DocuSign, Cisco Meraki, and Microsoft
+</div>
+
+</body>
+</html>

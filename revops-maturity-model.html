@@ -1,0 +1,802 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RevOps Maturity Model | James Jackson</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --bg:        #07090f;
+            --bg-card:   #0d1120;
+            --bg-input:  #111827;
+            --border:    #1c2840;
+            --border-md: #243354;
+            --accent:    #4f8ef7;
+            --accent-dim:#172240;
+            --l1: #64748b; --l1-dim: #1a222e; --l1-bg: #1f2937;
+            --l2: #3b82f6; --l2-dim: #172240; --l2-bg: #1a2e50;
+            --l3: #8b5cf6; --l3-dim: #1e133a; --l3-bg: #28184a;
+            --l4: #10b981; --l4-dim: #052e20; --l4-bg: #0a3d2c;
+            --l5: #f59e0b; --l5-dim: #3d2600; --l5-bg: #4a3000;
+            --text:   #e8edf5;
+            --text-2: #8b9bbf;
+            --text-3: #4a5a7a;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+        }
+
+        /* ── HEADER ── */
+        .header {
+            background: linear-gradient(180deg, #0a0f1e 0%, var(--bg) 100%);
+            border-bottom: 1px solid var(--border);
+            padding: 24px 36px 18px;
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 6px;
+        }
+
+        .header h1 {
+            font-size: 20px;
+            font-weight: 700;
+            letter-spacing: -0.3px;
+        }
+
+        .header p {
+            font-size: 13px;
+            color: var(--text-2);
+            margin-top: 3px;
+        }
+
+        .header-right {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .badge {
+            font-size: 11px;
+            font-weight: 600;
+            padding: 4px 11px;
+            border-radius: 20px;
+            letter-spacing: 0.4px;
+            text-transform: uppercase;
+        }
+
+        .badge-blue { background: var(--accent-dim); color: var(--accent); border: 1px solid #1e3a6e; }
+
+        .maturity-badge {
+            font-size: 12px;
+            font-weight: 700;
+            padding: 5px 14px;
+            border-radius: 20px;
+            letter-spacing: 0.3px;
+            transition: all 0.3s;
+        }
+
+        /* ── LEVEL COLORS ── */
+        .lc-1 { color: var(--l1); background: var(--l1-dim); border: 1px solid #2a3545; }
+        .lc-2 { color: var(--l2); background: var(--l2-dim); border: 1px solid #1e3a6e; }
+        .lc-3 { color: var(--l3); background: var(--l3-dim); border: 1px solid #2d1a5a; }
+        .lc-4 { color: var(--l4); background: var(--l4-dim); border: 1px solid #0a4a30; }
+        .lc-5 { color: var(--l5); background: var(--l5-dim); border: 1px solid #5a3a00; }
+
+        /* ── INSTRUCTION BAR ── */
+        .instruction {
+            background: var(--bg-card);
+            border-bottom: 1px solid var(--border);
+            padding: 10px 36px;
+            font-size: 12px;
+            color: var(--text-2);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .instruction-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
+
+        /* ── MATRIX CONTAINER ── */
+        .matrix-wrap {
+            padding: 20px 24px;
+            overflow-x: auto;
+        }
+
+        /* ── LEVEL HEADERS ── */
+        .matrix-level-headers {
+            display: grid;
+            grid-template-columns: 160px repeat(5, 1fr);
+            gap: 6px;
+            margin-bottom: 6px;
+        }
+
+        .level-header-cell {
+            text-align: center;
+            padding: 10px 8px;
+            border-radius: 8px 8px 0 0;
+            border: 1px solid var(--border);
+            border-bottom: none;
+        }
+
+        .level-num {
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            opacity: 0.7;
+        }
+
+        .level-name {
+            font-size: 12px;
+            font-weight: 700;
+            margin-top: 2px;
+        }
+
+        .lh-1 { background: var(--l1-dim); border-color: #2a3545; }
+        .lh-1 .level-num  { color: var(--l1); }
+        .lh-1 .level-name { color: var(--l1); }
+
+        .lh-2 { background: var(--l2-dim); border-color: #1e3a6e; }
+        .lh-2 .level-num  { color: var(--l2); }
+        .lh-2 .level-name { color: var(--l2); }
+
+        .lh-3 { background: var(--l3-dim); border-color: #2d1a5a; }
+        .lh-3 .level-num  { color: var(--l3); }
+        .lh-3 .level-name { color: var(--l3); }
+
+        .lh-4 { background: var(--l4-dim); border-color: #0a4a30; }
+        .lh-4 .level-num  { color: var(--l4); }
+        .lh-4 .level-name { color: var(--l4); }
+
+        .lh-5 { background: var(--l5-dim); border-color: #5a3a00; }
+        .lh-5 .level-num  { color: var(--l5); }
+        .lh-5 .level-name { color: var(--l5); }
+
+        /* ── MATRIX ROWS ── */
+        .matrix-row {
+            display: grid;
+            grid-template-columns: 160px repeat(5, 1fr);
+            gap: 6px;
+            margin-bottom: 6px;
+        }
+
+        .dim-header {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 0 12px 0 4px;
+        }
+
+        .dim-name {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text);
+            letter-spacing: 0.3px;
+        }
+
+        .dim-sub {
+            font-size: 10px;
+            color: var(--text-3);
+            margin-top: 2px;
+        }
+
+        /* Matrix Cells */
+        .matrix-cell {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 12px;
+            cursor: pointer;
+            transition: all 0.15s;
+            position: relative;
+            min-height: 80px;
+        }
+
+        .matrix-cell:hover {
+            border-color: var(--border-md);
+            transform: translateY(-1px);
+        }
+
+        .matrix-cell .cell-text {
+            font-size: 11px;
+            color: var(--text-2);
+            line-height: 1.5;
+        }
+
+        .matrix-cell .cell-check {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            border: 1.5px solid var(--border-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 9px;
+            transition: all 0.15s;
+        }
+
+        /* Selected states */
+        .matrix-cell.selected-1 { background: var(--l1-bg); border-color: var(--l1); }
+        .matrix-cell.selected-1 .cell-text { color: var(--text); }
+        .matrix-cell.selected-1 .cell-check { background: var(--l1); border-color: var(--l1); color: #fff; }
+
+        .matrix-cell.selected-2 { background: var(--l2-bg); border-color: var(--l2); }
+        .matrix-cell.selected-2 .cell-text { color: var(--text); }
+        .matrix-cell.selected-2 .cell-check { background: var(--l2); border-color: var(--l2); color: #fff; }
+
+        .matrix-cell.selected-3 { background: var(--l3-bg); border-color: var(--l3); }
+        .matrix-cell.selected-3 .cell-text { color: var(--text); }
+        .matrix-cell.selected-3 .cell-check { background: var(--l3); border-color: var(--l3); color: #fff; }
+
+        .matrix-cell.selected-4 { background: var(--l4-bg); border-color: var(--l4); }
+        .matrix-cell.selected-4 .cell-text { color: var(--text); }
+        .matrix-cell.selected-4 .cell-check { background: var(--l4); border-color: var(--l4); color: #fff; }
+
+        .matrix-cell.selected-5 { background: var(--l5-bg); border-color: var(--l5); }
+        .matrix-cell.selected-5 .cell-text { color: var(--text); }
+        .matrix-cell.selected-5 .cell-check { background: var(--l5); border-color: var(--l5); color: #fff; }
+
+        /* ── RESULTS ── */
+        .results {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 16px;
+            padding: 0 24px 20px;
+        }
+
+        .results-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 20px;
+        }
+
+        .results-card-title {
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: var(--text-3);
+            margin-bottom: 16px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .chart-wrap {
+            height: 200px;
+            position: relative;
+        }
+
+        /* Score breakdown */
+        .score-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 7px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .score-row:last-child { border-bottom: none; }
+
+        .score-dim {
+            font-size: 11px;
+            color: var(--text-2);
+            width: 120px;
+            flex-shrink: 0;
+        }
+
+        .score-bar-bg {
+            flex: 1;
+            height: 4px;
+            background: var(--bg-input);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .score-bar {
+            height: 100%;
+            border-radius: 2px;
+            transition: width 0.4s ease;
+        }
+
+        .score-val {
+            font-size: 11px;
+            font-weight: 700;
+            width: 30px;
+            text-align: right;
+        }
+
+        /* Recommendations */
+        .rec-item {
+            display: flex;
+            gap: 10px;
+            padding: 9px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .rec-item:last-child { border-bottom: none; }
+
+        .rec-num {
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--accent);
+            width: 14px;
+            flex-shrink: 0;
+            margin-top: 1px;
+        }
+
+        .rec-text {
+            font-size: 12px;
+            color: var(--text-2);
+            line-height: 1.55;
+        }
+
+        /* Overall maturity display */
+        .overall-level {
+            text-align: center;
+            padding: 16px 0 10px;
+        }
+
+        .level-circle {
+            width: 72px;
+            height: 72px;
+            border-radius: 50%;
+            margin: 0 auto 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            font-weight: 800;
+            letter-spacing: -1px;
+            border: 2px solid;
+            transition: all 0.4s;
+        }
+
+        .lev-label {
+            font-size: 14px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .lev-sub {
+            font-size: 12px;
+            color: var(--text-2);
+            margin-bottom: 14px;
+        }
+
+        .lev-desc {
+            font-size: 12px;
+            color: var(--text-2);
+            line-height: 1.6;
+            text-align: left;
+        }
+
+        /* ── FOOTER ── */
+        .footer {
+            text-align: center;
+            padding: 14px;
+            font-size: 12px;
+            color: var(--text-3);
+            border-top: 1px solid var(--border);
+        }
+
+        .footer a { color: var(--accent); text-decoration: none; }
+    </style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+    <div class="header-top">
+        <div>
+            <h1>RevOps Maturity Model</h1>
+            <p>Self-assessment across five dimensions — from manual operations to autonomous AI-driven revenue system</p>
+        </div>
+        <div class="header-right">
+            <span class="badge badge-blue">Framework</span>
+            <span class="maturity-badge" id="overallBadge">Select your levels →</span>
+        </div>
+    </div>
+</div>
+
+<div class="instruction">
+    <div class="instruction-dot"></div>
+    Click each cell to mark your organization's current maturity level for that dimension. Results update live.
+</div>
+
+<!-- MATRIX -->
+<div class="matrix-wrap">
+
+    <!-- Level Headers -->
+    <div class="matrix-level-headers">
+        <div></div>
+        <div class="level-header-cell lh-1">
+            <div class="level-num">Level 1</div>
+            <div class="level-name">Manual</div>
+        </div>
+        <div class="level-header-cell lh-2">
+            <div class="level-num">Level 2</div>
+            <div class="level-name">Data-Enabled</div>
+        </div>
+        <div class="level-header-cell lh-3">
+            <div class="level-num">Level 3</div>
+            <div class="level-name">Automated</div>
+        </div>
+        <div class="level-header-cell lh-4">
+            <div class="level-num">Level 4</div>
+            <div class="level-name">AI-Augmented</div>
+        </div>
+        <div class="level-header-cell lh-5">
+            <div class="level-num">Level 5</div>
+            <div class="level-name">Autonomous</div>
+        </div>
+    </div>
+
+    <!-- ROWS -->
+    <div id="matrixRows"></div>
+
+</div>
+
+<!-- RESULTS -->
+<div class="results">
+
+    <div class="results-card">
+        <div class="results-card-title">Overall Maturity</div>
+        <div class="overall-level">
+            <div class="level-circle" id="levelCircle">–</div>
+            <div class="lev-label" id="levelLabel">—</div>
+            <div class="lev-sub" id="levelSub">Complete assessment above</div>
+        </div>
+        <div class="lev-desc" id="levelDesc">Select your maturity level for each dimension in the grid above to see your overall assessment and recommendations.</div>
+    </div>
+
+    <div class="results-card">
+        <div class="results-card-title">Score by Dimension</div>
+        <div id="scoreBreakdown"></div>
+        <div class="chart-wrap" style="margin-top:16px;">
+            <canvas id="radarChart"></canvas>
+        </div>
+    </div>
+
+    <div class="results-card">
+        <div class="results-card-title">Priority Recommendations</div>
+        <div id="recommendations">
+            <div style="font-size:12px;color:var(--text-3);margin-top:8px;">Complete the assessment to see tailored recommendations.</div>
+        </div>
+    </div>
+
+</div>
+
+<!-- FOOTER -->
+<div class="footer">
+    James Jackson &nbsp;·&nbsp; RevOps Portfolio &nbsp;·&nbsp;
+    <a href="https://www.linkedin.com/in/jamesrjacksoniii" target="_blank">LinkedIn</a>
+    &nbsp;·&nbsp; Framework developed from patterns across 50+ B2B SaaS companies
+</div>
+
+<script>
+// ─────────────────────────────────────────────
+// MATRIX DATA
+// ─────────────────────────────────────────────
+const DIMENSIONS = [
+    {
+        id: 'data',
+        name: 'Data Foundation',
+        sub: 'CRM, warehouse, enrichment',
+        levels: [
+            'Spreadsheets and tribal knowledge. No single source of truth. CRM adoption <50%.',
+            'CRM adopted with basic hygiene rules. Manual enrichment. Reports built on request.',
+            'Auto-enrichment (Clay/Clearbit). Snowflake warehouse. Reliable daily reporting.',
+            'AI-scored accounts, real-time signals, cross-functional data products.',
+            'Self-correcting pipelines, proprietary data moats, zero latency, ML validation.',
+        ],
+    },
+    {
+        id: 'process',
+        name: 'Process Maturity',
+        sub: 'Workflows, handoffs, playbooks',
+        levels: [
+            'Anecdotal pipeline reviews, undocumented process, reactive. Every rep does it differently.',
+            'Structured templates, documented stage criteria, weekly review cadence.',
+            'CRM-enforced workflows, automated handoffs, SLA tracking, consistent methodology.',
+            'AI-flagged at-risk deals, dynamic playbooks, automated coaching signals (Gong).',
+            'AI-orchestrated workflows, zero-friction handoffs, self-optimizing process loops.',
+        ],
+    },
+    {
+        id: 'intelligence',
+        name: 'Revenue Intelligence',
+        sub: 'Forecasting, analytics, signals',
+        levels: [
+            'Gut-feel forecasting, high variance. KPIs tracked inconsistently, if at all.',
+            'Bottom-up rep + manager adjustments. Basic pipeline coverage ratios tracked.',
+            'Multi-method forecasting, defined KPIs (Magic Number, NRR, CAC payback), regular reviews.',
+            'AI forecasting (Clari), predictive analytics, scenario modeling, anomaly detection.',
+            '<5% forecast variance, autonomous signals, AI-generated board-level narrative.',
+        ],
+    },
+    {
+        id: 'stack',
+        name: 'Tech Stack',
+        sub: 'Tools, AI utilization, integrations',
+        levels: [
+            'Basic CRM or spreadsheets. Siloed tools. Manual exports. AI is ad hoc ChatGPT.',
+            'HubSpot or basic Salesforce. Simple integrations. AI writing tools for emails.',
+            'Salesforce well-configured, data warehouse, reliable bidirectional integrations.',
+            'AI across forecasting (Clari), call intelligence (Gong), enrichment, ABM (6sense).',
+            'Custom ML models, AI agents, proprietary intent data, enterprise data lakehouse.',
+        ],
+    },
+    {
+        id: 'org',
+        name: 'Organizational Design',
+        sub: 'RevOps structure, AI fluency, influence',
+        levels: [
+            'No dedicated RevOps. Sales ops is reactive admin. Minimal C-suite influence.',
+            'RevOps generalist supporting all GTM. Participates in monthly reviews.',
+            'Specialized team (ops, analytics, enablement). Strategic partner in QBRs.',
+            'RevOps owns data products and GTM efficiency narrative. Shapes investment decisions.',
+            'Internal data/AI engineering capability. COO/CRO rely on RevOps models.',
+        ],
+    },
+];
+
+const LEVEL_DEFS = [
+    { label:'Manual',        sub:'Reactive and tribal',    color:'var(--l1)', desc:'Operations are person-dependent and largely reactive. Data lives in multiple places. Forecasts are based on intuition. The cost of this stage is invisible until you try to scale.' },
+    { label:'Data-Enabled',  sub:'Foundation in place',    color:'var(--l2)', desc:'The basics are set: CRM adoption, defined process, structured reviews. This is the minimum viable foundation. Most companies overestimate how far beyond Level 2 they really are.' },
+    { label:'Automated',     sub:'Machine is running',     color:'var(--l3)', desc:'Workflows run without manual effort. Data is reliable. Reporting is self-serve. At this level, RevOps shifts from firefighting to optimization. This is the inflection point most RevOps leaders aim for.' },
+    { label:'AI-Augmented',  sub:'Intelligence layer live', color:'var(--l4)', desc:'AI is embedded in decision-making: forecasting, deal risk, coaching, territory design. RevOps operates as a strategic intelligence function. This is where significant competitive advantage begins.' },
+    { label:'Autonomous',    sub:'Self-correcting system', color:'var(--l5)', desc:'The system operates, corrects, and learns with minimal human intervention. Custom AI models, proprietary data, and autonomous workflows create compounding operational leverage. Rare — and defensible.' },
+];
+
+// ─────────────────────────────────────────────
+// RECOMMENDATIONS BY WEAKEST DIMENSIONS
+// ─────────────────────────────────────────────
+const RECS = {
+    data: [
+        'Data is your highest-leverage investment. A clean, enriched CRM with reliable Salesforce → Snowflake sync unlocks every downstream capability.',
+        'Implement Clay or Clearbit auto-enrichment before adding any more analytics tooling — garbage in, garbage out.',
+        'Designate a single data model owner. Every RevOps failure traces back to disagreements about what a "qualified opportunity" means.',
+    ],
+    process: [
+        'Document stage exit criteria in Salesforce before your next QBR. Undefined stages make pipeline reviews theater.',
+        'Automate the SDR → AE handoff first — it\'s the highest-volume, highest-cost point of context loss in most GTM motions.',
+        'Use Gong call data to build data-backed ramp benchmarks. Replace the 90-day "feel" with a measurable ramp curve.',
+    ],
+    intelligence: [
+        'Multi-method forecasting (rep input + historical + pipeline coverage) is the minimum bar before deploying AI. Don\'t let Clari sit on top of bad methodology.',
+        'Define your 5 core GTM KPIs and make them visible weekly before adding more metrics. Depth before breadth.',
+        'CAC payback is the most underused metric at growth-stage companies. Track it by segment, not just in aggregate.',
+    ],
+    stack: [
+        'Audit your current stack for redundancy before adding tools — most $10–100M companies have 15–25% stack overlap.',
+        'Build AI workflows (Claude API + Zapier or Make) for repetitive RevOps analyst tasks before hiring another analyst.',
+        'Salesforce data model quality compounds over time — either fix it now or it becomes a $500K re-implementation project in 18 months.',
+    ],
+    org: [
+        'The RevOps function should own a data product, not just a dashboard. That shift changes how the C-suite engages with it.',
+        'Hire for SQL + Salesforce admin + AI fluency — that profile outperforms any single specialist at growth stage.',
+        'If RevOps is not in the room when headcount plans are being set, it\'s a cost center. Change that before the next planning cycle.',
+    ],
+};
+
+// ─────────────────────────────────────────────
+// STATE
+// ─────────────────────────────────────────────
+let scores = { data: 0, process: 0, intelligence: 0, stack: 0, org: 0 };
+let radarChart = null;
+
+// ─────────────────────────────────────────────
+// BUILD MATRIX
+// ─────────────────────────────────────────────
+function buildMatrix() {
+    const container = document.getElementById('matrixRows');
+    container.innerHTML = DIMENSIONS.map(dim => {
+        const cells = dim.levels.map((text, i) => {
+            const lvl = i + 1;
+            return `
+                <div class="matrix-cell" data-dim="${dim.id}" data-level="${lvl}" onclick="selectCell(this)">
+                    <div class="cell-check">✓</div>
+                    <div class="cell-text">${text}</div>
+                </div>`;
+        }).join('');
+
+        return `
+            <div class="matrix-row">
+                <div class="dim-header">
+                    <div class="dim-name">${dim.name}</div>
+                    <div class="dim-sub">${dim.sub}</div>
+                </div>
+                ${cells}
+            </div>`;
+    }).join('');
+}
+
+// ─────────────────────────────────────────────
+// SELECT CELL
+// ─────────────────────────────────────────────
+function selectCell(cell) {
+    const dim   = cell.dataset.dim;
+    const level = parseInt(cell.dataset.level);
+
+    // Clear other selections in same dimension
+    document.querySelectorAll(`.matrix-cell[data-dim="${dim}"]`).forEach(c => {
+        c.className = 'matrix-cell';
+    });
+
+    // Apply selection
+    cell.classList.add(`selected-${level}`);
+    scores[dim] = level;
+
+    updateResults();
+}
+
+// ─────────────────────────────────────────────
+// UPDATE RESULTS
+// ─────────────────────────────────────────────
+function updateResults() {
+    const vals = Object.values(scores).filter(v => v > 0);
+    if (vals.length === 0) return;
+
+    const avg = vals.reduce((a, b) => a + b, 0) / vals.length;
+    const roundedLevel = Math.round(avg);
+    const def = LEVEL_DEFS[roundedLevel - 1] || LEVEL_DEFS[0];
+
+    // Overall badge
+    const badge = document.getElementById('overallBadge');
+    badge.textContent = `Level ${roundedLevel}: ${def.label}`;
+    badge.style.background = `rgba(${hexToRgb(def.color)}, 0.12)`;
+    badge.style.color = def.color;
+    badge.style.border = `1px solid rgba(${hexToRgb(def.color)}, 0.3)`;
+
+    // Level circle
+    const circle = document.getElementById('levelCircle');
+    circle.textContent = roundedLevel;
+    circle.style.background = `rgba(${hexToRgb(def.color)}, 0.1)`;
+    circle.style.color = def.color;
+    circle.style.borderColor = def.color;
+
+    document.getElementById('levelLabel').textContent = def.label;
+    document.getElementById('levelLabel').style.color = def.color;
+    document.getElementById('levelSub').textContent = def.sub;
+    document.getElementById('levelDesc').textContent = def.desc;
+
+    // Score breakdown
+    const dimOrder = ['data', 'process', 'intelligence', 'stack', 'org'];
+    const dimNames = { data:'Data Foundation', process:'Process', intelligence:'Intelligence', stack:'Tech Stack', org:'Org Design' };
+    const barColors = ['var(--l1)','var(--l2)','var(--l3)','var(--l4)','var(--l5)'];
+
+    document.getElementById('scoreBreakdown').innerHTML = dimOrder.map(d => {
+        const v = scores[d] || 0;
+        const pct = (v / 5) * 100;
+        const barColor = v > 0 ? LEVEL_DEFS[v-1].color : 'var(--border)';
+        return `
+            <div class="score-row">
+                <div class="score-dim">${dimNames[d]}</div>
+                <div class="score-bar-bg">
+                    <div class="score-bar" style="width:${pct}%;background:${barColor};"></div>
+                </div>
+                <div class="score-val" style="color:${v > 0 ? barColor : 'var(--text-3)'};">${v > 0 ? 'L' + v : '—'}</div>
+            </div>`;
+    }).join('');
+
+    // Radar
+    updateRadar(dimOrder.map(d => ((scores[d] || 0) / 5) * 100));
+
+    // Recommendations: prioritize lowest-scored dimensions
+    const sorted = dimOrder
+        .filter(d => scores[d] > 0)
+        .sort((a, b) => scores[a] - scores[b]);
+
+    const recItems = [];
+    sorted.slice(0, 2).forEach(d => {
+        const lvl = scores[d];
+        const rec = RECS[d][Math.min(lvl - 1, RECS[d].length - 1)];
+        recItems.push({ dim: dimNames[d], text: rec });
+    });
+
+    // Add a forward-looking rec based on overall level
+    if (roundedLevel <= 2) {
+        recItems.push({ dim:'Foundation', text:'Before adding any AI tools, establish a reliable CRM data model and consistent process definitions. AI compounds good data. It amplifies bad data.' });
+    } else if (roundedLevel === 3) {
+        recItems.push({ dim:'AI Readiness', text:'You have the infrastructure for AI. The next move is deploying Gong for call intelligence and Clari for forecasting — these two have the fastest payback in the stack.' });
+    } else if (roundedLevel >= 4) {
+        recItems.push({ dim:'Compounding', text:'At this maturity level, the highest-leverage move is building proprietary data products and custom AI workflows rather than purchasing additional point solutions.' });
+    }
+
+    document.getElementById('recommendations').innerHTML = recItems.slice(0, 4).map((r, i) => `
+        <div class="rec-item">
+            <span class="rec-num">${i+1}</span>
+            <span class="rec-text"><strong style="color:var(--text);">${r.dim}:</strong> ${r.text}</span>
+        </div>`).join('');
+}
+
+// ─────────────────────────────────────────────
+// RADAR CHART
+// ─────────────────────────────────────────────
+function updateRadar(scores) {
+    const ctx = document.getElementById('radarChart').getContext('2d');
+    const labels = ['Data','Process','Intelligence','Stack','Org Design'];
+
+    if (radarChart) {
+        radarChart.data.datasets[0].data = scores;
+        radarChart.update('none');
+        return;
+    }
+
+    radarChart = new Chart(ctx, {
+        type: 'radar',
+        data: {
+            labels,
+            datasets: [{
+                data: scores,
+                backgroundColor: 'rgba(79,142,247,0.12)',
+                borderColor: '#4f8ef7',
+                borderWidth: 2,
+                pointBackgroundColor: '#4f8ef7',
+                pointBorderColor: '#07090f',
+                pointBorderWidth: 2,
+                pointRadius: 4,
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                r: {
+                    min: 0, max: 100,
+                    ticks: { display: false },
+                    grid: { color: 'rgba(28,40,64,0.8)' },
+                    angleLines: { color: 'rgba(28,40,64,0.8)' },
+                    pointLabels: { color: '#8b9bbf', font: { size: 10 } }
+                }
+            },
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    backgroundColor: '#0d1120',
+                    borderColor: '#1c2840',
+                    borderWidth: 1,
+                    bodyColor: '#e8edf5',
+                    callbacks: { label: ctx => ` Level: ${(ctx.raw / 20).toFixed(1)} / 5` }
+                }
+            }
+        }
+    });
+}
+
+// ─────────────────────────────────────────────
+// UTIL: hex color var to rgb for rgba()
+// ─────────────────────────────────────────────
+const COLOR_MAP = {
+    'var(--l1)': '100,116,139',
+    'var(--l2)': '59,130,246',
+    'var(--l3)': '139,92,246',
+    'var(--l4)': '16,185,129',
+    'var(--l5)': '245,158,11',
+};
+
+function hexToRgb(colorVar) {
+    return COLOR_MAP[colorVar] || '79,142,247';
+}
+
+// ─────────────────────────────────────────────
+// INIT
+// ─────────────────────────────────────────────
+buildMatrix();
+</script>
+</body>
+</html>

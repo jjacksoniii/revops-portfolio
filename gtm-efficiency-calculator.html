@@ -1,0 +1,929 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GTM Efficiency Calculator | James Jackson</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --bg-primary: #07090f;
+            --bg-card: #0d1120;
+            --bg-input: #111827;
+            --border: #1c2840;
+            --border-light: #243354;
+            --accent: #4f8ef7;
+            --accent-dim: #172240;
+            --text-primary: #e8edf5;
+            --text-secondary: #8b9bbf;
+            --text-muted: #4a5a7a;
+            --green: #10b981;
+            --green-dim: #052e20;
+            --yellow: #f59e0b;
+            --yellow-dim: #3d2600;
+            --red: #ef4444;
+            --red-dim: #3b0d0d;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            line-height: 1.5;
+        }
+
+        /* ── HEADER ── */
+        .header {
+            background: linear-gradient(180deg, #0a0f1e 0%, #07090f 100%);
+            border-bottom: 1px solid var(--border);
+            padding: 28px 36px 22px;
+        }
+
+        .header-top {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            margin-bottom: 18px;
+        }
+
+        .header-left h1 {
+            font-size: 20px;
+            font-weight: 700;
+            letter-spacing: -0.4px;
+            color: var(--text-primary);
+        }
+
+        .header-left p {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-top: 4px;
+        }
+
+        .header-badges {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .badge {
+            font-size: 11px;
+            font-weight: 600;
+            padding: 4px 10px;
+            border-radius: 20px;
+            letter-spacing: 0.4px;
+            text-transform: uppercase;
+        }
+
+        .badge-blue {
+            background: var(--accent-dim);
+            color: var(--accent);
+            border: 1px solid #1e3a6e;
+        }
+
+        .badge-green {
+            background: var(--green-dim);
+            color: var(--green);
+            border: 1px solid #0a4a30;
+        }
+
+        /* Stage Selector */
+        .stage-selector {
+            display: flex;
+            gap: 6px;
+        }
+
+        .stage-btn {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-muted);
+            font-size: 12px;
+            font-weight: 500;
+            padding: 6px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.15s;
+            letter-spacing: 0.2px;
+        }
+
+        .stage-btn:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+            background: var(--accent-dim);
+        }
+
+        .stage-btn.active {
+            background: var(--accent-dim);
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        /* ── MAIN GRID ── */
+        .main {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            min-height: calc(100vh - 108px - 44px);
+        }
+
+        /* ── INPUTS ── */
+        .inputs-panel {
+            background: var(--bg-card);
+            border-right: 1px solid var(--border);
+            padding: 24px 20px;
+            overflow-y: auto;
+        }
+
+        .input-section {
+            margin-bottom: 26px;
+        }
+
+        .section-label {
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 1.2px;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            margin-bottom: 14px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .input-group {
+            margin-bottom: 12px;
+        }
+
+        .input-label {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-bottom: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .input-hint {
+            color: var(--text-muted);
+            font-size: 10px;
+        }
+
+        .input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .input-prefix, .input-suffix {
+            position: absolute;
+            color: var(--text-muted);
+            font-size: 13px;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .input-prefix { left: 10px; }
+        .input-suffix { right: 10px; }
+
+        input[type="number"] {
+            width: 100%;
+            background: var(--bg-input);
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+            font-size: 13px;
+            font-family: inherit;
+            padding: 7px 10px 7px 22px;
+            border-radius: 6px;
+            outline: none;
+            transition: border-color 0.15s;
+            -moz-appearance: textfield;
+        }
+
+        input[type="number"]::-webkit-outer-spin-button,
+        input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; }
+
+        input[type="number"]:focus { border-color: var(--accent); }
+        input[type="number"].has-suffix { padding-right: 26px; }
+
+        /* ── OUTPUTS ── */
+        .outputs-panel {
+            padding: 24px 28px;
+            overflow-y: auto;
+        }
+
+        /* Executive Summary */
+        .exec-summary {
+            background: linear-gradient(135deg, #0c1428 0%, #101b35 100%);
+            border: 1px solid #1e3a6e;
+            border-radius: 10px;
+            padding: 16px 20px;
+            margin-bottom: 20px;
+        }
+
+        .exec-summary-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+
+        .exec-summary-label {
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: var(--accent);
+        }
+
+        .health-badge {
+            font-size: 10px;
+            font-weight: 600;
+            padding: 2px 8px;
+            border-radius: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .health-badge.green { background: var(--green-dim); color: var(--green); border: 1px solid #0a4a30; }
+        .health-badge.yellow { background: var(--yellow-dim); color: var(--yellow); border: 1px solid #5a3a00; }
+        .health-badge.red { background: var(--red-dim); color: var(--red); border: 1px solid #5a1a1a; }
+
+        .exec-summary p {
+            font-size: 13px;
+            color: var(--text-primary);
+            line-height: 1.65;
+        }
+
+        /* Metrics Grid */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .metric-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 16px 18px;
+            position: relative;
+            overflow: hidden;
+            transition: border-color 0.2s;
+        }
+
+        .metric-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 2px;
+        }
+
+        .metric-card:hover { border-color: var(--border-light); }
+
+        .metric-card.green::before { background: linear-gradient(90deg, var(--green), #34d399); }
+        .metric-card.yellow::before { background: linear-gradient(90deg, var(--yellow), #fbbf24); }
+        .metric-card.red::before { background: linear-gradient(90deg, var(--red), #f87171); }
+        .metric-card.neutral::before { background: var(--border); }
+
+        .metric-name {
+            font-size: 10px;
+            font-weight: 600;
+            color: var(--text-muted);
+            letter-spacing: 0.8px;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+        }
+
+        .metric-value {
+            font-size: 26px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            margin-bottom: 5px;
+            line-height: 1;
+        }
+
+        .metric-card.green .metric-value { color: var(--green); }
+        .metric-card.yellow .metric-value { color: var(--yellow); }
+        .metric-card.red .metric-value { color: var(--red); }
+        .metric-card.neutral .metric-value { color: var(--text-secondary); }
+
+        .metric-status {
+            font-size: 11px;
+            font-weight: 500;
+            margin-bottom: 5px;
+        }
+
+        .metric-card.green .metric-status { color: var(--green); }
+        .metric-card.yellow .metric-status { color: var(--yellow); }
+        .metric-card.red .metric-status { color: var(--red); }
+
+        .metric-benchmark {
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
+        /* Bottom Grid */
+        .bottom-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+        }
+
+        .chart-card, .actions-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 20px;
+        }
+
+        .card-title {
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            margin-bottom: 16px;
+        }
+
+        .chart-container {
+            height: 210px;
+            position: relative;
+        }
+
+        /* Action Items */
+        .action-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .action-item:last-child { border-bottom: none; }
+
+        .action-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            margin-top: 5px;
+            flex-shrink: 0;
+        }
+
+        .action-dot.red { background: var(--red); box-shadow: 0 0 6px rgba(239,68,68,0.4); }
+        .action-dot.yellow { background: var(--yellow); box-shadow: 0 0 6px rgba(245,158,11,0.4); }
+        .action-dot.green { background: var(--green); box-shadow: 0 0 6px rgba(16,185,129,0.4); }
+
+        .action-text {
+            font-size: 12px;
+            color: var(--text-secondary);
+            line-height: 1.55;
+        }
+
+        /* ── FOOTER ── */
+        .footer {
+            text-align: center;
+            padding: 14px;
+            font-size: 12px;
+            color: var(--text-muted);
+            border-top: 1px solid var(--border);
+        }
+
+        .footer a {
+            color: var(--accent);
+            text-decoration: none;
+        }
+
+        .footer a:hover { text-decoration: underline; }
+
+        /* Tooltip */
+        .metric-card [title] { cursor: help; }
+
+        /* Responsive */
+        @media (max-width: 900px) {
+            .main { grid-template-columns: 1fr; }
+            .inputs-panel { border-right: none; border-bottom: 1px solid var(--border); }
+            .metrics-grid { grid-template-columns: repeat(2, 1fr); }
+            .bottom-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+    <div class="header-top">
+        <div class="header-left">
+            <h1>GTM Efficiency Calculator</h1>
+            <p>Benchmark your go-to-market efficiency against best-in-class SaaS companies</p>
+        </div>
+        <div class="header-badges">
+            <span class="badge badge-blue">CFO View</span>
+            <span class="badge badge-green" id="overallHealthBadge">Loading...</span>
+        </div>
+    </div>
+    <div class="stage-selector">
+        <button class="stage-btn" data-stage="early">$0–10M ARR</button>
+        <button class="stage-btn active" data-stage="growth">$10–50M ARR</button>
+        <button class="stage-btn" data-stage="scale">$50–200M ARR</button>
+        <button class="stage-btn" data-stage="enterprise">$200M+ ARR</button>
+    </div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+    <!-- INPUTS -->
+    <div class="inputs-panel">
+
+        <div class="input-section">
+            <div class="section-label">Revenue</div>
+
+            <div class="input-group">
+                <div class="input-label">Current ARR <span class="input-hint">Annual</span></div>
+                <div class="input-wrapper">
+                    <span class="input-prefix">$</span>
+                    <input type="number" id="arr" value="25000000" min="0">
+                </div>
+            </div>
+
+            <div class="input-group">
+                <div class="input-label">New ARR Added <span class="input-hint">Last 12 mo</span></div>
+                <div class="input-wrapper">
+                    <span class="input-prefix">$</span>
+                    <input type="number" id="newArr" value="8000000" min="0">
+                </div>
+            </div>
+
+            <div class="input-group">
+                <div class="input-label">Gross Margin</div>
+                <div class="input-wrapper">
+                    <input type="number" id="grossMargin" value="75" min="0" max="100" class="has-suffix">
+                    <span class="input-suffix">%</span>
+                </div>
+            </div>
+
+            <div class="input-group">
+                <div class="input-label">Net Revenue Retention</div>
+                <div class="input-wrapper">
+                    <input type="number" id="nrr" value="108" min="0" max="200" class="has-suffix">
+                    <span class="input-suffix">%</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="input-section">
+            <div class="section-label">Sales & Marketing</div>
+
+            <div class="input-group">
+                <div class="input-label">S&M Spend <span class="input-hint">Fully-loaded annual</span></div>
+                <div class="input-wrapper">
+                    <span class="input-prefix">$</span>
+                    <input type="number" id="smSpend" value="12000000" min="0">
+                </div>
+            </div>
+
+            <div class="input-group">
+                <div class="input-label">S&M Headcount</div>
+                <div class="input-wrapper">
+                    <span class="input-prefix">#</span>
+                    <input type="number" id="smHeadcount" value="30" min="1">
+                </div>
+            </div>
+
+            <div class="input-group">
+                <div class="input-label">New Customers Won <span class="input-hint">Last 12 mo</span></div>
+                <div class="input-wrapper">
+                    <span class="input-prefix">#</span>
+                    <input type="number" id="newCustomers" value="45" min="1">
+                </div>
+            </div>
+
+            <div class="input-group">
+                <div class="input-label">Avg Contract Value <span class="input-hint">ACV</span></div>
+                <div class="input-wrapper">
+                    <span class="input-prefix">$</span>
+                    <input type="number" id="acv" value="35000" min="0">
+                </div>
+            </div>
+        </div>
+
+        <div class="input-section">
+            <div class="section-label">Organization</div>
+
+            <div class="input-group">
+                <div class="input-label">Total Headcount</div>
+                <div class="input-wrapper">
+                    <span class="input-prefix">#</span>
+                    <input type="number" id="totalHeadcount" value="120" min="1">
+                </div>
+            </div>
+
+            <div class="input-group">
+                <div class="input-label">GTM Tech Spend <span class="input-hint">Annual total</span></div>
+                <div class="input-wrapper">
+                    <span class="input-prefix">$</span>
+                    <input type="number" id="techSpend" value="800000" min="0">
+                </div>
+            </div>
+        </div>
+
+    </div><!-- /inputs-panel -->
+
+    <!-- OUTPUTS -->
+    <div class="outputs-panel">
+
+        <!-- Executive Summary -->
+        <div class="exec-summary">
+            <div class="exec-summary-header">
+                <div class="exec-summary-label">Executive Summary</div>
+                <span class="health-badge" id="healthBadge">—</span>
+            </div>
+            <p id="summaryText">Calculating...</p>
+        </div>
+
+        <!-- Metrics -->
+        <div class="metrics-grid" id="metricsGrid"></div>
+
+        <!-- Bottom: Radar + Actions -->
+        <div class="bottom-grid">
+            <div class="chart-card">
+                <div class="card-title">Efficiency Profile</div>
+                <div class="chart-container">
+                    <canvas id="radarChart"></canvas>
+                </div>
+            </div>
+            <div class="actions-card">
+                <div class="card-title">CFO Action Items</div>
+                <div id="actionItems"></div>
+            </div>
+        </div>
+
+    </div><!-- /outputs-panel -->
+
+</div><!-- /main -->
+
+<!-- FOOTER -->
+<div class="footer">
+    James Jackson &nbsp;·&nbsp; RevOps Portfolio &nbsp;·&nbsp;
+    <a href="https://www.linkedin.com/in/jamesrjacksoniii" target="_blank">LinkedIn</a>
+    &nbsp;·&nbsp; Benchmarks sourced from Bessemer, OpenView, and Meritech public SaaS datasets
+</div>
+
+<script>
+// ─────────────────────────────────────────────
+// BENCHMARK DATA BY ARR STAGE
+// higher = better unless noted (lowerBetter: true)
+// ─────────────────────────────────────────────
+const BENCHMARKS = {
+    early: {
+        label: '$0–10M ARR',
+        magicNumber:          { excellent:1.5, good:1.0,  ok:0.7,  poor:0.4,  lowerBetter:false, fmt:'x'      },
+        gtmEfficiency:        { excellent:1.2, good:0.8,  ok:0.5,  poor:0.3,  lowerBetter:false, fmt:'x'      },
+        cacPayback:           { excellent:12,  good:18,   ok:24,   poor:36,   lowerBetter:true,  fmt:'mo'     },
+        ltvCac:               { excellent:7,   good:5,    ok:3,    poor:2,    lowerBetter:false, fmt:'x'      },
+        nrr:                  { excellent:115, good:105,  ok:95,   poor:85,   lowerBetter:false, fmt:'pct'    },
+        revenuePerEmployee:   { excellent:250000, good:175000, ok:125000, poor:85000, lowerBetter:false, fmt:'dollar' },
+    },
+    growth: {
+        label: '$10–50M ARR',
+        magicNumber:          { excellent:1.5, good:1.0,  ok:0.7,  poor:0.4,  lowerBetter:false, fmt:'x'      },
+        gtmEfficiency:        { excellent:1.2, good:0.8,  ok:0.5,  poor:0.3,  lowerBetter:false, fmt:'x'      },
+        cacPayback:           { excellent:14,  good:20,   ok:28,   poor:40,   lowerBetter:true,  fmt:'mo'     },
+        ltvCac:               { excellent:7,   good:5,    ok:3,    poor:2,    lowerBetter:false, fmt:'x'      },
+        nrr:                  { excellent:120, good:110,  ok:100,  poor:90,   lowerBetter:false, fmt:'pct'    },
+        revenuePerEmployee:   { excellent:350000, good:250000, ok:175000, poor:120000, lowerBetter:false, fmt:'dollar' },
+    },
+    scale: {
+        label: '$50–200M ARR',
+        magicNumber:          { excellent:1.5, good:1.0,  ok:0.7,  poor:0.4,  lowerBetter:false, fmt:'x'      },
+        gtmEfficiency:        { excellent:1.2, good:0.8,  ok:0.5,  poor:0.3,  lowerBetter:false, fmt:'x'      },
+        cacPayback:           { excellent:16,  good:22,   ok:30,   poor:45,   lowerBetter:true,  fmt:'mo'     },
+        ltvCac:               { excellent:8,   good:5,    ok:3,    poor:2,    lowerBetter:false, fmt:'x'      },
+        nrr:                  { excellent:125, good:115,  ok:105,  poor:95,   lowerBetter:false, fmt:'pct'    },
+        revenuePerEmployee:   { excellent:500000, good:350000, ok:250000, poor:175000, lowerBetter:false, fmt:'dollar' },
+    },
+    enterprise: {
+        label: '$200M+ ARR',
+        magicNumber:          { excellent:1.5, good:1.0,  ok:0.7,  poor:0.4,  lowerBetter:false, fmt:'x'      },
+        gtmEfficiency:        { excellent:1.2, good:0.8,  ok:0.5,  poor:0.3,  lowerBetter:false, fmt:'x'      },
+        cacPayback:           { excellent:18,  good:24,   ok:36,   poor:48,   lowerBetter:true,  fmt:'mo'     },
+        ltvCac:               { excellent:10,  good:7,    ok:4,    poor:2.5,  lowerBetter:false, fmt:'x'      },
+        nrr:                  { excellent:130, good:120,  ok:110,  poor:100,  lowerBetter:false, fmt:'pct'    },
+        revenuePerEmployee:   { excellent:700000, good:500000, ok:350000, poor:250000, lowerBetter:false, fmt:'dollar' },
+    }
+};
+
+// ─────────────────────────────────────────────
+// STATE
+// ─────────────────────────────────────────────
+let currentStage = 'growth';
+let radarChart = null;
+
+// ─────────────────────────────────────────────
+// HELPERS
+// ─────────────────────────────────────────────
+const getVal = id => parseFloat(document.getElementById(id).value) || 0;
+
+function fmt(n, type) {
+    if (!isFinite(n) || isNaN(n)) return '—';
+    switch(type) {
+        case 'dollar':
+            if (n >= 1e6) return '$' + (n/1e6).toFixed(1) + 'M';
+            if (n >= 1e3) return '$' + Math.round(n/1e3) + 'K';
+            return '$' + Math.round(n);
+        case 'pct': return n.toFixed(1) + '%';
+        case 'x':   return n.toFixed(1) + 'x';
+        case 'mo':  return n.toFixed(1) + ' mo';
+        default:    return n.toFixed(2);
+    }
+}
+
+function getColor(value, bench) {
+    const { excellent, good, ok, poor, lowerBetter } = bench;
+    if (lowerBetter) {
+        if (value <= excellent) return 'green';
+        if (value <= good)      return 'green';
+        if (value <= ok)        return 'yellow';
+        if (value <= poor)      return 'yellow';
+        return 'red';
+    } else {
+        if (value >= excellent) return 'green';
+        if (value >= good)      return 'green';
+        if (value >= ok)        return 'yellow';
+        if (value >= poor)      return 'yellow';
+        return 'red';
+    }
+}
+
+function getStatusLabel(color) {
+    if (color === 'green')  return '▲ Best-in-class';
+    if (color === 'yellow') return '◆ Adequate';
+    return '▼ Below target';
+}
+
+function toRadarScore(value, bench) {
+    const { excellent, good, ok, poor, lowerBetter } = bench;
+    if (lowerBetter) {
+        if (value <= excellent) return 100;
+        if (value <= good)      return 78;
+        if (value <= ok)        return 52;
+        if (value <= poor)      return 28;
+        return 10;
+    } else {
+        if (value >= excellent) return 100;
+        if (value >= good)      return 78;
+        if (value >= ok)        return 52;
+        if (value >= poor)      return 28;
+        return 10;
+    }
+}
+
+// ─────────────────────────────────────────────
+// CALCULATE
+// ─────────────────────────────────────────────
+function calculate() {
+    const arr             = getVal('arr');
+    const newArr          = getVal('newArr');
+    const grossMargin     = getVal('grossMargin') / 100;
+    const nrr             = getVal('nrr');
+    const smSpend         = getVal('smSpend');
+    const newCustomers    = getVal('newCustomers');
+    const acv             = getVal('acv');
+    const totalHeadcount  = getVal('totalHeadcount');
+    const techSpend       = getVal('techSpend');
+
+    const b = BENCHMARKS[currentStage];
+
+    // Core metrics
+    const magicNumber        = smSpend > 0 ? (newArr * grossMargin) / smSpend : 0;
+    const gtmEfficiency      = smSpend > 0 ? newArr / smSpend : 0;
+    const cac                = newCustomers > 0 ? smSpend / newCustomers : 0;
+    const cacPayback         = (acv > 0 && grossMargin > 0) ? (cac / (acv * grossMargin)) * 12 : 0;
+
+    // LTV: using NRR as growth proxy. If NRR > 100%, business grows forever — cap at 7yr horizon
+    const annualChurnProxy   = Math.max(0.01, (200 - nrr) / 100); // rough inverse of NRR
+    const ltv                = acv * grossMargin * Math.min(7, 1 / annualChurnProxy);
+    const ltvCac             = cac > 0 ? ltv / cac : 0;
+    const revenuePerEmployee = totalHeadcount > 0 ? arr / totalHeadcount : 0;
+
+    // Scores
+    const scores = {
+        magicNumber:        getColor(magicNumber,        b.magicNumber),
+        gtmEfficiency:      getColor(gtmEfficiency,      b.gtmEfficiency),
+        cacPayback:         getColor(cacPayback,          b.cacPayback),
+        ltvCac:             getColor(ltvCac,             b.ltvCac),
+        nrr:                getColor(nrr,                b.nrr),
+        revenuePerEmployee: getColor(revenuePerEmployee, b.revenuePerEmployee),
+    };
+
+    // Radar scores
+    const radarScores = [
+        toRadarScore(magicNumber,        b.magicNumber),
+        toRadarScore(ltvCac,             b.ltvCac),
+        toRadarScore(nrr,                b.nrr),
+        toRadarScore(revenuePerEmployee, b.revenuePerEmployee),
+        toRadarScore(cacPayback,         b.cacPayback),
+        toRadarScore(gtmEfficiency,      b.gtmEfficiency),
+    ];
+
+    renderMetrics({ magicNumber, gtmEfficiency, cacPayback, ltvCac, nrr, revenuePerEmployee }, scores, b);
+    renderRadar(radarScores);
+    renderSummary({ magicNumber, cacPayback, ltvCac, nrr, revenuePerEmployee }, scores);
+    renderActions({ magicNumber, cacPayback, ltvCac, nrr, revenuePerEmployee, techSpend, arr, smSpend, newArr }, scores, b);
+}
+
+// ─────────────────────────────────────────────
+// RENDER: METRICS
+// ─────────────────────────────────────────────
+function renderMetrics(metrics, scores, b) {
+    const defs = [
+        { key:'magicNumber',        label:'Magic Number',        hint:'(New ARR × GM) ÷ S&M Spend',          bench: `Best-in-class: ≥${b.magicNumber.excellent}x` },
+        { key:'gtmEfficiency',      label:'GTM Efficiency',      hint:'New ARR ÷ S&M Spend',                  bench: `Target: ≥${b.gtmEfficiency.good}x` },
+        { key:'cacPayback',         label:'CAC Payback',         hint:'Months to recover CAC',                bench: `Best: <${b.cacPayback.excellent} months` },
+        { key:'ltvCac',             label:'LTV : CAC',           hint:'Customer lifetime value vs. cost',     bench: `Target: ≥${b.ltvCac.good}x` },
+        { key:'nrr',                label:'Net Revenue Retention', hint:'Expansion minus churn',              bench: `Best-in-class: ≥${b.nrr.excellent}%` },
+        { key:'revenuePerEmployee', label:'Revenue / Employee',  hint:'ARR per full-time employee',           bench: `Target: ≥${fmt(b.revenuePerEmployee.good, 'dollar')}` },
+    ];
+
+    document.getElementById('metricsGrid').innerHTML = defs.map(d => {
+        const color = scores[d.key];
+        const value = fmt(metrics[d.key], b[d.key].fmt);
+        return `
+            <div class="metric-card ${color}" title="${d.hint}">
+                <div class="metric-name">${d.label}</div>
+                <div class="metric-value">${value}</div>
+                <div class="metric-status">${getStatusLabel(color)}</div>
+                <div class="metric-benchmark">${d.bench}</div>
+            </div>`;
+    }).join('');
+}
+
+// ─────────────────────────────────────────────
+// RENDER: RADAR
+// ─────────────────────────────────────────────
+function renderRadar(scores) {
+    const ctx = document.getElementById('radarChart').getContext('2d');
+    const labels = ['Magic Number','LTV:CAC','NRR','Rev/Employee','CAC Payback','GTM Efficiency'];
+
+    if (radarChart) {
+        radarChart.data.datasets[0].data = scores;
+        radarChart.update('none');
+        return;
+    }
+
+    radarChart = new Chart(ctx, {
+        type: 'radar',
+        data: {
+            labels,
+            datasets: [{
+                data: scores,
+                backgroundColor: 'rgba(79,142,247,0.12)',
+                borderColor: '#4f8ef7',
+                borderWidth: 2,
+                pointBackgroundColor: '#4f8ef7',
+                pointBorderColor: '#07090f',
+                pointBorderWidth: 2,
+                pointRadius: 4,
+                pointHoverRadius: 6,
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                r: {
+                    min: 0,
+                    max: 100,
+                    ticks: { display: false, stepSize: 25 },
+                    grid: { color: 'rgba(28,40,64,0.8)' },
+                    angleLines: { color: 'rgba(28,40,64,0.8)' },
+                    pointLabels: { color: '#8b9bbf', font: { size: 10.5 } }
+                }
+            },
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    backgroundColor: '#0d1120',
+                    borderColor: '#1c2840',
+                    borderWidth: 1,
+                    titleColor: '#8b9bbf',
+                    bodyColor: '#e8edf5',
+                    callbacks: { label: ctx => ` Score: ${ctx.raw} / 100` }
+                }
+            }
+        }
+    });
+}
+
+// ─────────────────────────────────────────────
+// RENDER: SUMMARY
+// ─────────────────────────────────────────────
+function renderSummary(metrics, scores) {
+    const greenCount = Object.values(scores).filter(s => s === 'green').length;
+    const redCount   = Object.values(scores).filter(s => s === 'red').length;
+
+    let healthClass, healthLabel, opener;
+    if (greenCount >= 5) {
+        healthClass = 'green'; healthLabel = 'Strong';
+        opener = 'GTM engine is operating at or above best-in-class benchmarks.';
+    } else if (redCount >= 3) {
+        healthClass = 'red'; healthLabel = 'At Risk';
+        opener = 'GTM efficiency requires structural attention before scaling investment.';
+    } else if (greenCount >= 3 && redCount <= 1) {
+        healthClass = 'green'; healthLabel = 'Solid';
+        opener = 'GTM efficiency is solid with selective improvement opportunities.';
+    } else {
+        healthClass = 'yellow'; healthLabel = 'Mixed';
+        opener = 'GTM engine shows mixed efficiency — some metrics are strong, others need attention.';
+    }
+
+    const nrrNote = metrics.nrr >= 110
+        ? `NRR of ${fmt(metrics.nrr,'pct')} confirms strong expansion motion and reduces reliance on new logo acquisition.`
+        : metrics.nrr < 100
+        ? `NRR of ${fmt(metrics.nrr,'pct')} signals a retention problem that will compound at scale — this is the highest-priority fix.`
+        : `NRR of ${fmt(metrics.nrr,'pct')} is adequate; pushing above 110% would meaningfully improve capital efficiency.`;
+
+    const effNote = scores.magicNumber === 'green'
+        ? `Magic Number of ${fmt(metrics.magicNumber,'x')} supports increased S&M investment — the unit economics justify the bet.`
+        : scores.magicNumber === 'red'
+        ? `Magic Number of ${fmt(metrics.magicNumber,'x')} indicates S&M spend should be held until root cause is identified.`
+        : `Magic Number of ${fmt(metrics.magicNumber,'x')} is workable — optimize conversion and ACV before materially increasing spend.`;
+
+    document.getElementById('healthBadge').className = `health-badge ${healthClass}`;
+    document.getElementById('healthBadge').textContent = healthLabel;
+    document.getElementById('overallHealthBadge').className = `badge badge-${healthClass === 'green' ? 'green' : 'blue'}`;
+    document.getElementById('overallHealthBadge').textContent = healthLabel;
+    document.getElementById('summaryText').textContent = `${opener} ${nrrNote} ${effNote}`;
+}
+
+// ─────────────────────────────────────────────
+// RENDER: ACTION ITEMS
+// ─────────────────────────────────────────────
+function renderActions(m, scores, b) {
+    const actions = [];
+
+    if (m.nrr < 100) {
+        actions.push({ color:'red', text:`NRR below 100% means you're losing revenue from existing customers. Fix retention before optimizing acquisition — otherwise CAC investment compounds on a leaking base.` });
+    }
+
+    if (scores.magicNumber === 'red') {
+        actions.push({ color:'red', text:`Magic Number of ${fmt(m.magicNumber,'x')} is below threshold. Hold S&M investment until root-caused: likely a conversion rate, ACV, segment mix, or churn problem.` });
+    }
+
+    if (scores.cacPayback === 'red') {
+        actions.push({ color:'red', text:`CAC payback of ${fmt(m.cacPayback,'mo')} exceeds acceptable range for ${BENCHMARKS[currentStage].label}. Audit lead quality, ICP fit, and rep productivity before next spend cycle.` });
+    }
+
+    if (scores.ltvCac === 'yellow' || scores.ltvCac === 'red') {
+        actions.push({ color:'yellow', text:`LTV:CAC of ${fmt(m.ltvCac,'x')} is below target. Primary levers: raise ACV through packaging or upsell, improve gross margin, or tighten ICP to reduce CAC.` });
+    }
+
+    if (scores.revenuePerEmployee === 'yellow' || scores.revenuePerEmployee === 'red') {
+        actions.push({ color:'yellow', text:`Revenue per employee of ${fmt(m.revenuePerEmployee,'dollar')} suggests headcount is outpacing ARR growth. AI-augmented workflows and process automation should precede next hiring cycle.` });
+    }
+
+    if (m.techSpend > 0 && m.arr > 0 && (m.techSpend / m.arr) > 0.08) {
+        actions.push({ color:'yellow', text:`Tech spend ratio of ${fmt((m.techSpend/m.arr)*100,'pct')} of ARR is elevated. Audit stack for redundancy and AI-replacement opportunities before next renewal cycle.` });
+    }
+
+    if (scores.magicNumber === 'green' && scores.cacPayback !== 'red') {
+        actions.push({ color:'green', text:`Magic Number of ${fmt(m.magicNumber,'x')} supports increased S&M investment. Model a 20–30% spend increase and current efficiency ratios justify the bet at ${BENCHMARKS[currentStage].label}.` });
+    }
+
+    if (m.nrr >= 115) {
+        actions.push({ color:'green', text:`Strong NRR of ${fmt(m.nrr,'pct')} creates a compounding growth base. Model NRR's contribution to ARR plan — this reduces new logo dependence and improves payback math.` });
+    }
+
+    if (actions.length === 0) {
+        actions.push({ color:'green', text:'All key metrics within acceptable ranges. Maintain efficiency discipline as you scale — the next inflection point typically comes at 2–3x current ARR.' });
+    }
+
+    document.getElementById('actionItems').innerHTML = actions.slice(0,5).map(a => `
+        <div class="action-item">
+            <div class="action-dot ${a.color}"></div>
+            <div class="action-text">${a.text}</div>
+        </div>`).join('');
+}
+
+// ─────────────────────────────────────────────
+// EVENT LISTENERS
+// ─────────────────────────────────────────────
+document.querySelectorAll('.stage-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+        document.querySelectorAll('.stage-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        currentStage = btn.dataset.stage;
+        calculate();
+    });
+});
+
+document.querySelectorAll('input[type="number"]').forEach(input => {
+    input.addEventListener('input', calculate);
+});
+
+// Init
+calculate();
+</script>
+</body>
+</html>

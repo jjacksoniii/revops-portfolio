@@ -1,0 +1,858 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI-Native RevOps Stack Architecture | James Jackson</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --bg:         #07090f;
+            --bg-card:    #0d1120;
+            --bg-input:   #111827;
+            --border:     #1c2840;
+            --border-md:  #243354;
+            --accent:     #4f8ef7;
+            --accent-dim: #172240;
+            --purple:     #8b5cf6;
+            --purple-dim: #1e133a;
+            --gray:       #64748b;
+            --gray-dim:   #1a222e;
+            --green:      #10b981;
+            --green-dim:  #052e20;
+            --yellow:     #f59e0b;
+            --red:        #ef4444;
+            --text:       #e8edf5;
+            --text-2:     #8b9bbf;
+            --text-3:     #4a5a7a;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            line-height: 1.5;
+        }
+
+        /* ── HEADER ── */
+        .header {
+            background: linear-gradient(180deg, #0a0f1e 0%, var(--bg) 100%);
+            border-bottom: 1px solid var(--border);
+            padding: 26px 36px 20px;
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 18px;
+        }
+
+        .header h1 {
+            font-size: 20px;
+            font-weight: 700;
+            letter-spacing: -0.3px;
+        }
+
+        .header p {
+            font-size: 13px;
+            color: var(--text-2);
+            margin-top: 4px;
+        }
+
+        .badge {
+            font-size: 11px;
+            font-weight: 600;
+            padding: 4px 11px;
+            border-radius: 20px;
+            letter-spacing: 0.4px;
+            text-transform: uppercase;
+            background: var(--accent-dim);
+            color: var(--accent);
+            border: 1px solid #1e3a6e;
+        }
+
+        /* Stage Tabs */
+        .stage-tabs {
+            display: flex;
+            gap: 0;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            overflow: hidden;
+            width: fit-content;
+        }
+
+        .stage-tab {
+            background: transparent;
+            border: none;
+            border-right: 1px solid var(--border);
+            color: var(--text-3);
+            font-size: 12px;
+            font-weight: 500;
+            font-family: inherit;
+            padding: 7px 20px;
+            cursor: pointer;
+            transition: all 0.15s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+        }
+
+        .stage-tab:last-child { border-right: none; }
+
+        .stage-tab .tab-arr {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-2);
+        }
+
+        .stage-tab .tab-name {
+            font-size: 10px;
+            color: var(--text-3);
+        }
+
+        .stage-tab:hover {
+            background: var(--accent-dim);
+            color: var(--accent);
+        }
+
+        .stage-tab:hover .tab-arr { color: var(--accent); }
+
+        .stage-tab.active {
+            background: var(--accent-dim);
+            color: var(--accent);
+        }
+
+        .stage-tab.active .tab-arr { color: var(--accent); }
+        .stage-tab.active .tab-name { color: var(--accent); opacity: 0.7; }
+
+        /* ── MAIN LAYOUT ── */
+        .main {
+            display: grid;
+            grid-template-columns: 1fr 320px;
+            gap: 0;
+            min-height: calc(100vh - 110px - 44px);
+        }
+
+        /* ── STACK PANEL ── */
+        .stack-panel {
+            padding: 24px 28px;
+            border-right: 1px solid var(--border);
+            overflow-y: auto;
+        }
+
+        .stage-headline {
+            margin-bottom: 20px;
+        }
+
+        .stage-title {
+            font-size: 17px;
+            font-weight: 700;
+            letter-spacing: -0.3px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 5px;
+        }
+
+        .stage-phase {
+            font-size: 11px;
+            font-weight: 600;
+            padding: 3px 10px;
+            border-radius: 12px;
+            background: var(--accent-dim);
+            color: var(--accent);
+            border: 1px solid #1e3a6e;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        .stage-desc {
+            font-size: 13px;
+            color: var(--text-2);
+            line-height: 1.6;
+        }
+
+        /* ── STACK LAYERS ── */
+        .stack-layers {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .layer-row {
+            display: grid;
+            grid-template-columns: 130px 1fr;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .layer-label {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+
+        .layer-name {
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 0.8px;
+            text-transform: uppercase;
+        }
+
+        .layer-desc {
+            font-size: 10px;
+            color: var(--text-3);
+        }
+
+        /* Layer colors */
+        .layer-row[data-layer="intelligence"] .layer-name { color: var(--accent); }
+        .layer-row[data-layer="engagement"]   .layer-name { color: var(--purple); }
+        .layer-row[data-layer="crm"]          .layer-name { color: var(--green); }
+        .layer-row[data-layer="data"]         .layer-name { color: var(--yellow); }
+        .layer-row[data-layer="planning"]     .layer-name { color: #fb923c; }
+
+        .layer-tools {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 7px;
+        }
+
+        /* Tool Cards */
+        .tool-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 7px;
+            padding: 8px 12px;
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            transition: border-color 0.15s, transform 0.1s;
+            cursor: default;
+        }
+
+        .tool-card:hover {
+            border-color: var(--border-md);
+            transform: translateY(-1px);
+        }
+
+        .tool-card.featured {
+            border-color: var(--border-md);
+        }
+
+        .tool-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .tool-dot.ai-native   { background: var(--accent); box-shadow: 0 0 6px rgba(79,142,247,0.5); }
+        .tool-dot.ai-enhanced { background: var(--purple);  box-shadow: 0 0 6px rgba(139,92,246,0.5); }
+        .tool-dot.infra       { background: var(--gray);    }
+
+        .tool-name {
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--text);
+        }
+
+        .tool-tag {
+            font-size: 9px;
+            font-weight: 600;
+            padding: 1px 6px;
+            border-radius: 8px;
+            letter-spacing: 0.4px;
+            text-transform: uppercase;
+        }
+
+        .tool-tag.new {
+            background: var(--green-dim);
+            color: var(--green);
+            border: 1px solid #0a4a30;
+        }
+
+        /* ── LEGEND ── */
+        .legend {
+            display: flex;
+            gap: 20px;
+            margin-top: 16px;
+            padding-top: 14px;
+            border-top: 1px solid var(--border);
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 11px;
+            color: var(--text-2);
+        }
+
+        .legend-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+        }
+
+        .legend-dot.ai-native   { background: var(--accent); box-shadow: 0 0 6px rgba(79,142,247,0.5); }
+        .legend-dot.ai-enhanced { background: var(--purple);  box-shadow: 0 0 6px rgba(139,92,246,0.5); }
+        .legend-dot.infra       { background: var(--gray);    }
+
+        /* ── SIDEBAR ── */
+        .sidebar {
+            padding: 24px 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .sidebar-section {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 18px;
+        }
+
+        .sidebar-section-title {
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: var(--text-3);
+            margin-bottom: 14px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        /* Efficiency Targets */
+        .target-item {
+            margin-bottom: 12px;
+        }
+
+        .target-item:last-child { margin-bottom: 0; }
+
+        .target-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            margin-bottom: 4px;
+        }
+
+        .target-name {
+            font-size: 11px;
+            color: var(--text-2);
+        }
+
+        .target-value {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text);
+        }
+
+        .target-bar-bg {
+            height: 3px;
+            background: var(--bg-input);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .target-bar {
+            height: 100%;
+            border-radius: 2px;
+            background: linear-gradient(90deg, var(--accent), #6ba3f9);
+            transition: width 0.4s ease;
+        }
+
+        /* Priority items */
+        .priority-item {
+            display: flex;
+            gap: 10px;
+            padding: 8px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .priority-item:last-child { border-bottom: none; }
+
+        .priority-num {
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--accent);
+            width: 14px;
+            flex-shrink: 0;
+            margin-top: 1px;
+        }
+
+        .priority-text {
+            font-size: 12px;
+            color: var(--text-2);
+            line-height: 1.5;
+        }
+
+        /* Next Stage */
+        .next-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+            padding: 7px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .next-item:last-child { border-bottom: none; }
+
+        .next-arrow {
+            font-size: 10px;
+            color: var(--green);
+            margin-top: 2px;
+            flex-shrink: 0;
+        }
+
+        .next-text {
+            font-size: 12px;
+            color: var(--text-2);
+            line-height: 1.5;
+        }
+
+        .last-stage-note {
+            font-size: 12px;
+            color: var(--text-2);
+            line-height: 1.6;
+            font-style: italic;
+        }
+
+        /* ── FOOTER ── */
+        .footer {
+            text-align: center;
+            padding: 14px;
+            font-size: 12px;
+            color: var(--text-3);
+            border-top: 1px solid var(--border);
+        }
+
+        .footer a { color: var(--accent); text-decoration: none; }
+        .footer a:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+    <div class="header-top">
+        <div>
+            <h1>AI-Native RevOps Stack Architecture</h1>
+            <p>Recommended GTM stack by growth stage — with efficiency targets for each layer</p>
+        </div>
+        <span class="badge">COO View</span>
+    </div>
+    <div class="stage-tabs">
+        <button class="stage-tab active" data-stage="early">
+            <span class="tab-arr">$0–10M</span>
+            <span class="tab-name">Land & Establish</span>
+        </button>
+        <button class="stage-tab" data-stage="growth">
+            <span class="tab-arr">$10–50M</span>
+            <span class="tab-name">Build the Machine</span>
+        </button>
+        <button class="stage-tab" data-stage="scale">
+            <span class="tab-arr">$50–200M</span>
+            <span class="tab-name">Scale with Leverage</span>
+        </button>
+        <button class="stage-tab" data-stage="enterprise">
+            <span class="tab-arr">$200M+</span>
+            <span class="tab-name">AI-Native OS</span>
+        </button>
+    </div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+    <!-- STACK PANEL -->
+    <div class="stack-panel">
+        <div class="stage-headline">
+            <div class="stage-title">
+                <span id="stageTitle"></span>
+                <span class="stage-phase" id="stagePhase"></span>
+            </div>
+            <p class="stage-desc" id="stageDesc"></p>
+        </div>
+
+        <div class="stack-layers" id="stackLayers"></div>
+
+        <div class="legend">
+            <div class="legend-item"><div class="legend-dot ai-native"></div> AI-Native — AI is the core product</div>
+            <div class="legend-item"><div class="legend-dot ai-enhanced"></div> AI-Enhanced — Traditional tool + AI features</div>
+            <div class="legend-item"><div class="legend-dot infra"></div> Infrastructure — Foundation layer</div>
+        </div>
+    </div>
+
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+
+        <div class="sidebar-section">
+            <div class="sidebar-section-title">Efficiency Targets</div>
+            <div id="efficiencyTargets"></div>
+        </div>
+
+        <div class="sidebar-section">
+            <div class="sidebar-section-title">Strategic Priorities</div>
+            <div id="priorities"></div>
+        </div>
+
+        <div class="sidebar-section" id="nextStageSection">
+            <div class="sidebar-section-title">Next Stage: What to Add</div>
+            <div id="nextStage"></div>
+        </div>
+
+    </div>
+
+</div>
+
+<!-- FOOTER -->
+<div class="footer">
+    James Jackson &nbsp;·&nbsp; RevOps Portfolio &nbsp;·&nbsp;
+    <a href="https://www.linkedin.com/in/jamesrjacksoniii" target="_blank">LinkedIn</a>
+    &nbsp;·&nbsp; Framework reflects patterns across 50+ SaaS companies at each growth stage
+</div>
+
+<script>
+// ─────────────────────────────────────────────
+// LAYER DEFINITIONS
+// ─────────────────────────────────────────────
+const LAYER_META = {
+    intelligence: { name:'Revenue Intelligence', desc:'Signals, AI, forecasting', icon:'◈' },
+    engagement:   { name:'Engagement',           desc:'Outreach, sequences, enablement', icon:'◉' },
+    crm:          { name:'CRM & Pipeline',        desc:'Core system of record', icon:'◆' },
+    data:         { name:'Data Foundation',       desc:'Enrichment, warehouse, integrations', icon:'◇' },
+    planning:     { name:'Planning & Ops',        desc:'Territory, quota, comp', icon:'○' },
+};
+
+// ─────────────────────────────────────────────
+// STAGE DATA
+// ─────────────────────────────────────────────
+const STAGES = {
+    early: {
+        title: '$0–10M ARR',
+        phase: 'Land & Establish',
+        desc: 'At this stage, speed beats sophistication. The goal is finding repeatable GTM motion and proving the unit economics before investing in infrastructure. Keep the stack lean — every tool should earn its seat. One AI-literate RevOps hire is worth more than five disconnected point solutions.',
+        stack: {
+            intelligence: [
+                { name:'Claude / GPT-4o', type:'ai-native', featured:true },
+                { name:'Apollo AI',       type:'ai-native' },
+                { name:'Clay (lite)',     type:'ai-native' },
+                { name:'Gong Starter',   type:'ai-enhanced' },
+            ],
+            engagement: [
+                { name:'HubSpot Sequences', type:'ai-enhanced', featured:true },
+                { name:'LinkedIn Sales Nav', type:'infra' },
+                { name:'Loom',               type:'infra' },
+                { name:'Calendly',           type:'infra' },
+            ],
+            crm: [
+                { name:'HubSpot CRM',  type:'ai-enhanced', featured:true },
+                { name:'Pipedrive',    type:'infra' },
+            ],
+            data: [
+                { name:'Apollo.io',        type:'ai-enhanced', featured:true },
+                { name:'Clay',             type:'ai-native' },
+                { name:'Google Analytics', type:'infra' },
+                { name:'Zapier',           type:'infra' },
+            ],
+            planning: [
+                { name:'Google Sheets',      type:'infra', featured:true },
+                { name:'HubSpot Reports',    type:'ai-enhanced' },
+                { name:'Captivate IQ (lite)',type:'infra' },
+            ],
+        },
+        targets: [
+            { name:'Magic Number',         value:'>0.7x',    pct:50 },
+            { name:'CAC Payback',          value:'<24 mo',   pct:55 },
+            { name:'NRR',                  value:'>95%',     pct:50 },
+            { name:'Revenue / Employee',   value:'>$125K',   pct:40 },
+            { name:'Tech Spend / ARR',     value:'<12%',     pct:60 },
+        ],
+        priorities: [
+            'Prove ICP and repeatable motion before adding stack complexity',
+            'Use AI (Claude/GPT) as a force multiplier for a small team — research, personalization, analysis',
+            'HubSpot as single system of record; resist Salesforce until $5–8M ARR',
+            'Clay + Apollo replace 3–4 point tools for enrichment and prospecting',
+        ],
+        nextStage: [
+            'Migrate to Salesforce when deal complexity and reporting needs exceed HubSpot',
+            'Add Gong for call intelligence once you have 5+ AEs and need coaching at scale',
+            'Introduce Outreach/Salesloft for sequence management and rep performance analytics',
+            'Stand up Snowflake + Fivetran when BI needs exceed native CRM reporting',
+        ],
+    },
+
+    growth: {
+        title: '$10–50M ARR',
+        phase: 'Build the Machine',
+        desc: 'This is the infrastructure-building stage. You know the motion; now engineer it to scale without linear headcount. The architecture choices you make here (especially your data model and CRM configuration) will either accelerate or constrain you through the next 3–4x of growth. Invest in the data foundation before the analytics layer.',
+        stack: {
+            intelligence: [
+                { name:'Gong',              type:'ai-native', featured:true },
+                { name:'6sense (Starter)',   type:'ai-native' },
+                { name:'Clari',             type:'ai-native' },
+                { name:'Claude Workflows',  type:'ai-native', tag:'new' },
+            ],
+            engagement: [
+                { name:'Outreach',           type:'ai-enhanced', featured:true },
+                { name:'LinkedIn Sales Nav', type:'infra' },
+                { name:'Highspot',           type:'ai-enhanced', tag:'new' },
+                { name:'ZoomInfo Engage',    type:'ai-enhanced' },
+            ],
+            crm: [
+                { name:'Salesforce (Sales Cloud)', type:'ai-enhanced', featured:true },
+                { name:'Salesforce CPQ',           type:'ai-enhanced', tag:'new' },
+            ],
+            data: [
+                { name:'Snowflake',   type:'infra', featured:true, tag:'new' },
+                { name:'Fivetran',    type:'infra', tag:'new' },
+                { name:'ZoomInfo',    type:'ai-enhanced' },
+                { name:'Clearbit',    type:'ai-enhanced' },
+                { name:'Workato',     type:'infra' },
+            ],
+            planning: [
+                { name:'Clari (Forecasting)', type:'ai-native', featured:true, tag:'new' },
+                { name:'Xactly Incent',       type:'infra', tag:'new' },
+                { name:'Salesforce Reports',  type:'infra' },
+                { name:'Tableau / Looker',    type:'infra', tag:'new' },
+            ],
+        },
+        targets: [
+            { name:'Magic Number',         value:'>0.8x',    pct:58 },
+            { name:'CAC Payback',          value:'<20 mo',   pct:62 },
+            { name:'NRR',                  value:'>110%',    pct:65 },
+            { name:'Revenue / Employee',   value:'>$200K',   pct:55 },
+            { name:'Tech Spend / ARR',     value:'<8%',      pct:68 },
+        ],
+        priorities: [
+            'Salesforce data model is the most leveraged investment — get it right before scale',
+            'Gong + Clari create an intelligence loop: conversation reality → pipeline reality',
+            'Snowflake as the single source of truth across CRM, finance, and product data',
+            'First dedicated RevOps hire should own the data layer, not the tools layer',
+        ],
+        nextStage: [
+            'Upgrade 6sense to full ABM platform as ICP expands and enterprise motion matures',
+            'Add DemandBase or Bombora for buyer intent signals to prioritize outbound effort',
+            'Build dbt transformation layer on Snowflake to enable self-serve analytics',
+            'Introduce Varicent or Anaplan for comp planning as plan complexity grows',
+        ],
+    },
+
+    scale: {
+        title: '$50–200M ARR',
+        phase: 'Scale with Leverage',
+        desc: 'At this stage the question shifts from "does our stack work?" to "how do we compound operational leverage without linear headcount growth?" AI becomes a genuine multiplier, not a novelty. The RevOps function should now own its own data products and operate like an internal analytics and automation team embedded in GTM.',
+        stack: {
+            intelligence: [
+                { name:'Gong Collective',     type:'ai-native', featured:true },
+                { name:'6sense (Full ABM)',    type:'ai-native' },
+                { name:'Clari Enterprise',    type:'ai-native' },
+                { name:'Bombora',             type:'ai-native', tag:'new' },
+                { name:'Custom AI Workflows', type:'ai-native', tag:'new' },
+            ],
+            engagement: [
+                { name:'Outreach Enterprise',  type:'ai-enhanced', featured:true },
+                { name:'DemandBase',           type:'ai-native', tag:'new' },
+                { name:'Highspot Enterprise',  type:'ai-enhanced' },
+                { name:'LinkedIn Enterprise',  type:'infra' },
+                { name:'AI SDR (Artisan)',     type:'ai-native', tag:'new' },
+            ],
+            crm: [
+                { name:'Salesforce Enterprise',  type:'ai-enhanced', featured:true },
+                { name:'Revenue Cloud',          type:'ai-enhanced', tag:'new' },
+                { name:'Einstein (AI layer)',     type:'ai-native', tag:'new' },
+            ],
+            data: [
+                { name:'Snowflake Enterprise', type:'infra', featured:true },
+                { name:'dbt',                  type:'infra', tag:'new' },
+                { name:'Fivetran',             type:'infra' },
+                { name:'RudderStack CDP',      type:'infra', tag:'new' },
+                { name:'Clearbit Enterprise',  type:'ai-enhanced' },
+            ],
+            planning: [
+                { name:'Clari Enterprise',   type:'ai-native', featured:true },
+                { name:'Varicent',           type:'ai-enhanced', tag:'new' },
+                { name:'Anaplan (lite)',     type:'infra', tag:'new' },
+                { name:'Looker / Tableau',   type:'infra' },
+            ],
+        },
+        targets: [
+            { name:'Magic Number',         value:'>0.8x',    pct:60 },
+            { name:'CAC Payback',          value:'<22 mo',   pct:65 },
+            { name:'NRR',                  value:'>115%',    pct:72 },
+            { name:'Revenue / Employee',   value:'>$300K',   pct:65 },
+            { name:'Tech Spend / ARR',     value:'<6%',      pct:75 },
+        ],
+        priorities: [
+            'Build internal AI workflows (Claude API, custom models) to automate RevOps analyst work',
+            'CDP + dbt layer enables real-time pipeline signals that Salesforce alone cannot deliver',
+            'AI SDRs (Artisan, 11x) expand outbound capacity without proportional headcount',
+            'Varicent/Anaplan replace spreadsheet comp planning — critical at 200+ quota-carrying reps',
+        ],
+        nextStage: [
+            'Move to Anaplan Enterprise for multi-scenario revenue planning at board level',
+            'Build proprietary intent data pipeline rather than relying solely on 6sense/Bombora',
+            'Custom AI model fine-tuned on your deal data for win probability and churn prediction',
+            'Invest in RevOps data engineering — treat your GTM data as a product',
+        ],
+    },
+
+    enterprise: {
+        title: '$200M+ ARR',
+        phase: 'AI-Native Operating Model',
+        desc: 'The stack is now an operating system. The architecture question is no longer which tools to buy — it\'s how to build proprietary data moats, autonomous workflows, and AI-driven decision-making that your competitors cannot replicate. RevOps functions as a strategic P&L lever, not a support function. AI augments every layer of the GTM motion.',
+        stack: {
+            intelligence: [
+                { name:'Gong Intelligence Suite',  type:'ai-native', featured:true },
+                { name:'Custom AI Models (Claude API)', type:'ai-native' },
+                { name:'Clari Enterprise AI',      type:'ai-native' },
+                { name:'Proprietary Intent Data',  type:'ai-native', tag:'new' },
+                { name:'DataRobot / H2O',          type:'ai-native', tag:'new' },
+            ],
+            engagement: [
+                { name:'Outreach Enterprise AI',   type:'ai-enhanced', featured:true },
+                { name:'DemandBase Enterprise',    type:'ai-native' },
+                { name:'AI SDR Platform',          type:'ai-native' },
+                { name:'Highspot Enterprise',      type:'ai-enhanced' },
+                { name:'Custom ABM Orchestration', type:'ai-native', tag:'new' },
+            ],
+            crm: [
+                { name:'Salesforce Enterprise',       type:'ai-enhanced', featured:true },
+                { name:'Revenue Cloud (full)',         type:'ai-enhanced' },
+                { name:'Einstein + Copilot',          type:'ai-native' },
+                { name:'Custom Data Model (+ AI)',    type:'ai-native', tag:'new' },
+            ],
+            data: [
+                { name:'Enterprise Data Lakehouse', type:'infra', featured:true },
+                { name:'Real-Time CDP',             type:'infra' },
+                { name:'Custom ML Pipelines',       type:'ai-native', tag:'new' },
+                { name:'dbt + Fivetran',            type:'infra' },
+                { name:'Internal Data Products',    type:'ai-native', tag:'new' },
+            ],
+            planning: [
+                { name:'Anaplan Enterprise',        type:'infra', featured:true },
+                { name:'Varicent Enterprise',       type:'ai-enhanced' },
+                { name:'AI Territory Optimization', type:'ai-native', tag:'new' },
+                { name:'AI Forecasting (custom)',   type:'ai-native', tag:'new' },
+            ],
+        },
+        targets: [
+            { name:'Magic Number',         value:'>0.8x',    pct:62 },
+            { name:'CAC Payback',          value:'<24 mo',   pct:68 },
+            { name:'NRR',                  value:'>120%',    pct:80 },
+            { name:'Revenue / Employee',   value:'>$450K',   pct:80 },
+            { name:'Tech Spend / ARR',     value:'<5%',      pct:82 },
+        ],
+        priorities: [
+            'Custom AI models trained on proprietary deal, churn, and expansion data create durable moats',
+            'RevOps operates as a data product team — internal APIs, ML models, and automated workflows',
+            'Autonomous AI agents handle SDR prospecting, pipeline hygiene, and renewal forecasting',
+            'Board-level planning (Anaplan) integrates with real-time GTM signals — no more quarterly spreadsheet reconciliation',
+        ],
+        nextStage: null,
+    },
+};
+
+// ─────────────────────────────────────────────
+// RENDER
+// ─────────────────────────────────────────────
+let currentStage = 'early';
+
+function render() {
+    const s = STAGES[currentStage];
+
+    // Headline
+    document.getElementById('stageTitle').textContent  = s.title;
+    document.getElementById('stagePhase').textContent  = s.phase;
+    document.getElementById('stageDesc').textContent   = s.desc;
+
+    // Stack Layers
+    const layersEl = document.getElementById('stackLayers');
+    layersEl.innerHTML = Object.entries(s.stack).map(([key, tools]) => {
+        const meta = LAYER_META[key];
+        const toolCards = tools.map(t => {
+            const tagHTML = t.tag ? `<span class="tool-tag new">${t.tag}</span>` : '';
+            return `
+                <div class="tool-card ${t.featured ? 'featured' : ''}">
+                    <div class="tool-dot ${t.type}"></div>
+                    <span class="tool-name">${t.name}</span>
+                    ${tagHTML}
+                </div>`;
+        }).join('');
+
+        return `
+            <div class="layer-row" data-layer="${key}">
+                <div class="layer-label">
+                    <div class="layer-name">${meta.name}</div>
+                    <div class="layer-desc">${meta.desc}</div>
+                </div>
+                <div class="layer-tools">${toolCards}</div>
+            </div>`;
+    }).join('');
+
+    // Efficiency Targets
+    document.getElementById('efficiencyTargets').innerHTML = s.targets.map(t => `
+        <div class="target-item">
+            <div class="target-header">
+                <span class="target-name">${t.name}</span>
+                <span class="target-value">${t.value}</span>
+            </div>
+            <div class="target-bar-bg">
+                <div class="target-bar" style="width:${t.pct}%"></div>
+            </div>
+        </div>`).join('');
+
+    // Priorities
+    document.getElementById('priorities').innerHTML = s.priorities.map((p, i) => `
+        <div class="priority-item">
+            <span class="priority-num">${i+1}</span>
+            <span class="priority-text">${p}</span>
+        </div>`).join('');
+
+    // Next Stage
+    const nextEl = document.getElementById('nextStage');
+    const nextSection = document.getElementById('nextStageSection');
+    if (s.nextStage) {
+        nextSection.style.display = 'block';
+        nextEl.innerHTML = s.nextStage.map(n => `
+            <div class="next-item">
+                <span class="next-arrow">→</span>
+                <span class="next-text">${n}</span>
+            </div>`).join('');
+    } else {
+        nextSection.style.display = 'none';
+    }
+
+    // Animate bars
+    requestAnimationFrame(() => {
+        document.querySelectorAll('.target-bar').forEach((bar, i) => {
+            const pct = s.targets[i]?.pct || 0;
+            bar.style.width = '0%';
+            setTimeout(() => { bar.style.width = pct + '%'; }, 50 + i * 40);
+        });
+    });
+}
+
+// ─────────────────────────────────────────────
+// EVENTS
+// ─────────────────────────────────────────────
+document.querySelectorAll('.stage-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+        document.querySelectorAll('.stage-tab').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        currentStage = tab.dataset.stage;
+        render();
+    });
+});
+
+render();
+</script>
+</body>
+</html>

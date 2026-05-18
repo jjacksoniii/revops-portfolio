@@ -128,10 +128,12 @@
   .tc-blue::before{background:linear-gradient(90deg,#4f8cff,#6366f1)}
   .tc-green::before{background:linear-gradient(90deg,#2ecc8e,#059669)}
   .tc-purple::before{background:linear-gradient(90deg,#9b79f5,#7c3aed)}
+  .tc-orange::before{background:linear-gradient(90deg,#fb923c,#ea580c)}
   .tool-icon{width:42px;height:42px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:19px;margin-bottom:16px}
   .tc-blue .tool-icon{background:rgba(79,140,255,.1)}
   .tc-green .tool-icon{background:rgba(46,204,142,.1)}
   .tc-purple .tool-icon{background:rgba(155,121,245,.1)}
+  .tc-orange .tool-icon{background:rgba(251,146,60,.1)}
   .tool-card h3{font-size:16px;font-weight:700;letter-spacing:-.2px;margin-bottom:7px}
   .tool-desc{font-size:14px;color:var(--t2);line-height:1.65;margin-bottom:16px;flex:1}
   .tool-tags{display:flex;flex-wrap:wrap;gap:5px}
@@ -449,7 +451,7 @@
 <section class="section" id="tools">
   <div class="s-label">Working Tools</div>
   <div class="s-title">RevOps in Practice</div>
-  <p class="s-sub">Interactive tools that demonstrate how I think about RevOps systems. Not slide decks. Working software.</p>
+  <p class="s-sub">Five working tools that demonstrate how I think about RevOps systems. Not slide decks — working software built on real frameworks.</p>
   <div class="tools-grid">
     <a href="pipeline-health-dashboard.html" class="tool-card tc-blue">
       <div class="tool-icon">⚡</div>
@@ -458,20 +460,34 @@
       <div class="tool-desc">CRO-level executive cockpit. Health score (R/Y/G), coverage vs. quota, stage conversion benchmarking, top vs. bottom of funnel gaps, velocity projection, and auto-generated action items.</div>
       <div class="tool-tags"><span>Coverage</span><span>Funnel Gaps</span><span>Win Rate</span><span>Velocity</span><span>CRO View</span></div>
     </a>
-    <div class="tool-card tc-green">
-      <div class="tool-icon">🗺</div>
-      <div class="t-status t-soon">Coming Soon</div>
-      <h3>Territory Model Builder</h3>
-      <div class="tool-desc">Balanced territory design using account scoring, rep capacity modeling, and TAM-based optimization. Equitable assignments with coverage metrics and attainment potential.</div>
-      <div class="tool-tags"><span>Account Scoring</span><span>Capacity</span><span>TAM</span><span>Equity Score</span></div>
-    </div>
-    <div class="tool-card tc-purple">
+    <a href="gtm-efficiency-calculator.html" class="tool-card tc-green">
+      <div class="tool-icon">📊</div>
+      <div class="t-status t-live">Live</div>
+      <h3>GTM Efficiency Calculator</h3>
+      <div class="tool-desc">Real-time benchmarking tool for CFOs and CEOs. Enter your ARR, S&M spend, and headcount — get Magic Number, CAC payback, LTV:CAC, NRR, and revenue per employee benchmarked against best-in-class SaaS at your growth stage.</div>
+      <div class="tool-tags"><span>Magic Number</span><span>CAC Payback</span><span>LTV:CAC</span><span>NRR</span><span>CFO View</span></div>
+    </a>
+    <a href="ai-stack-architecture.html" class="tool-card tc-purple">
       <div class="tool-icon">🏗</div>
-      <div class="t-status t-soon">Coming Soon</div>
-      <h3>Rev Tech Stack Architect</h3>
-      <div class="tool-desc">Interactive framework for designing an AI-native revenue tech stack by company stage, from seed through enterprise. Integration dependencies, coverage gaps, and cost-of-sale estimates.</div>
-      <div class="tool-tags"><span>Stack Design</span><span>Integration Map</span><span>Stage-Gated</span><span>Cost Model</span></div>
-    </div>
+      <div class="t-status t-live">Live</div>
+      <h3>AI-Native Stack Architecture</h3>
+      <div class="tool-desc">Recommended GTM stack by ARR stage — $0–10M through $200M+. Five layers (intelligence, engagement, CRM, data, planning) with tools color-coded by AI maturity type and efficiency targets for each stage.</div>
+      <div class="tool-tags"><span>Stack Design</span><span>AI-Native</span><span>Stage-Gated</span><span>COO View</span></div>
+    </a>
+    <a href="revops-maturity-model.html" class="tool-card tc-blue">
+      <div class="tool-icon">🎯</div>
+      <div class="t-status t-live">Live</div>
+      <h3>RevOps Maturity Model</h3>
+      <div class="tool-desc">Interactive self-assessment across five dimensions: Data Foundation, Process, Revenue Intelligence, Tech Stack, and Org Design. Click your level, get a radar chart, score breakdown, and tailored recommendations.</div>
+      <div class="tool-tags"><span>Maturity Assessment</span><span>5 Dimensions</span><span>Benchmarks</span><span>Recommendations</span></div>
+    </a>
+    <a href="operating-model-canvas.html" class="tool-card tc-orange">
+      <div class="tool-icon">🗺</div>
+      <div class="t-status t-live">Live</div>
+      <h3>GTM Operating Model Canvas</h3>
+      <div class="tool-desc">One-page visual framework connecting Revenue Strategy, Org Design, GTM Process, and Tech Architecture through a shared Data & Intelligence layer. Board-level KPI targets, AI automation tiers, and operating principles.</div>
+      <div class="tool-tags"><span>Canvas</span><span>AI Automation</span><span>Board KPIs</span><span>COO Framework</span></div>
+    </a>
   </div>
 </section>
 
