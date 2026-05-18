@@ -690,8 +690,8 @@ function calculate() {
     const avgQuota  = aeHeadcount > 0 ? newArr / aeHeadcount : 0;
     // Quota:OTE ratio — target ≥ 4x
     const quotaOte  = aeOte > 0 ? avgQuota / aeOte : 0;
-    // ECV:OTE — effective return accounting for actual attainment
-    // "ECV" = quota × attainment%; represents what was actually sold vs. what you paid
+    // ACV:OTE — actual contract value return accounting for attainment
+    // ACV = quota × attainment%; represents what was actually sold vs. what you paid
     const ecvOte    = aeOte > 0 ? (avgQuota * (attainment / 100)) / aeOte : 0;
 
     // ── SCORES ──
@@ -757,7 +757,7 @@ function renderGTMMetrics(metrics, colorMap, b) {
 // RENDER: REP PRODUCTIVITY METRICS
 // ─────────────────────────────────────────────
 function renderRepMetrics(metrics, colorMap, b) {
-    // ECV:OTE color: green if ≥ 4x, yellow if ≥ 3x, red otherwise
+    // ACV:OTE color: green if ≥ 4x, yellow if ≥ 3x, red otherwise
     const ecvColor = metrics.ecvOte >= 4 ? 'green' : metrics.ecvOte >= 3 ? 'yellow' : 'red';
     const ecvStatus = metrics.ecvOte >= 4 ? '▲ Strong return' : metrics.ecvOte >= 3 ? '◆ Adequate' : '▼ Below 4x target';
 
@@ -780,11 +780,11 @@ function renderRepMetrics(metrics, colorMap, b) {
         },
         {
             color: ecvColor,
-            name: 'ECV : OTE',
+            name: 'ACV : OTE',
             value: fmt(metrics.ecvOte, 'x'),
             status: ecvStatus,
             bench: 'Target: ≥4x · Quota × Attainment ÷ OTE',
-            hint: 'Effective return: actual production vs. what you paid'
+            hint: 'ACV return: actual production vs. what you paid'
         },
     ];
 
@@ -915,7 +915,7 @@ function renderActions(m, colorMap, b) {
     }
 
     if (m.ecvOte > 0 && m.ecvOte < 4) {
-        actions.push({ color:'yellow', text:`ECV:OTE of ${fmt(m.ecvOte,'x')} — the actual return on comp investment after attainment — is below the 4x target. Closing the gap requires either higher attainment or a better Quota:OTE ratio.` });
+        actions.push({ color:'yellow', text:`ACV:OTE of ${fmt(m.ecvOte,'x')} — the actual return on comp investment after attainment — is below the 4x target. Closing the gap requires either higher attainment or a better Quota:OTE ratio.` });
     }
 
     if (colorMap.ltvCac === 'yellow' || colorMap.ltvCac === 'red') {
